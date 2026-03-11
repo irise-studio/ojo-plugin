@@ -1,0 +1,117 @@
+{
+  "name": "ojo-plugin",
+  "displayName": "ojo-plugin",
+  "description": "A VS Code extension",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.105.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*",
+    "onStartupFinished",
+    "onCommand:ojo-plugin.openWeb"
+  ],
+  "main": "./dist/extension.js",
+  "enabledApiProposals": [
+    "externalUriOpener"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "ojo-plugin.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "ojo-plugin.openWeb",
+        "title": "Ojo: Open Web (Sync Login)"
+      }
+    ],
+    "configuration": {
+      "title": "Ojo Plugin",
+      "properties": {
+        "ojoPlugin.serverPort": {
+          "type": "number",
+          "default": 37123,
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Local HTTP server port started when the extension activates."
+        },
+        "ojoPlugin.accountApiBaseUrl": {
+          "type": "string",
+          "default": "https://aneway.ai",
+          "description": "Base URL of the account API service used for create_ide_handoff."
+        },
+        "ojoPlugin.webBaseUrl": {
+          "type": "string",
+          "default": "https://aneway.ai",
+          "description": "Base URL of the web app."
+        },
+        "ojoPlugin.webTargetPath": {
+          "type": "string",
+          "default": "/",
+          "description": "Default web path to open when triggering web login sync."
+        },
+        "ojoPlugin.loginBridgePath": {
+          "type": "string",
+          "default": "/login/ide/handoff",
+          "description": "Web login bridge path that consumes the handoff ticket."
+        },
+        "ojoPlugin.productUriGlobs": {
+          "type": "array",
+          "default": [
+            "https://aneway.ai/**",
+            "https://*.aneway.ai/**",
+            "https://ojo.art/**",
+            "http://ojo.art/**",
+            "https://www.baidu.com/**",
+            "http://www.baidu.com/**"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "URI glob patterns that should open in the IDE built-in browser."
+        },
+        "ojoPlugin.syncCliCommand": {
+          "type": "string",
+          "default": "ojo",
+          "description": "CLI command used for workspace sync."
+        },
+        "ojoPlugin.autoOpenBrowserOnActivate": {
+          "type": "boolean",
+          "default": true,
+          "description": "扩展激活时自动在 IDE 内置浏览器中打开 Web 应用，保持扩展常驻。"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "vsix": "npm run compile && npx @vscode/vsce package --no-dependencies",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.110.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.56.1",
+    "eslint": "^9.39.3",
+    "esbuild": "^0.27.3",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
