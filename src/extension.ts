@@ -5,6 +5,7 @@ import { ensureProductDomainsUseBuiltinBrowser, normalizeUriGlobs } from './exte
 import { registerOjoUriOpener } from './ojoUriOpener';
 import { registerOjoExternalUriOpener } from './ojoExternalUriOpener';
 import { buildIdeLaunchQueryParams, detectIdeClient, generateSyncToken } from './ideContext';
+import { buildProjectTargetPath, selectProjectIdFromCli, type ProjectPickerUi } from './projectLauncher';
 import { resolveWebLaunchUrl } from './webHandoff';
 import {
 	internalErrorResponse,
@@ -22,7 +23,9 @@ let server: Server | undefined;
 let listeningPort = 37123;
 let activeSyncToken: string | undefined;
 let syncInProgress = false;
+let projectPickerInProgress = false;
 const authStateProvider = new AuthStateProvider();
+const OJO_PROJECTS_VIEW_ID = 'ojo-plugin.projectsView';
 
 export function activate(context: vscode.ExtensionContext) {
 	try {
@@ -34,25 +37,21 @@ export function activate(context: vscode.ExtensionContext) {
 		registerOjoExternalUriOpener(context);
 		startServer();
 
-		const config = vscode.workspace.getConfiguration('ojoPlugin');
-		if (config.get<boolean>('autoOpenBrowserOnActivate', true)) {
-			void openWebInBuiltinBrowser();
-		}
-
 		const disposable = vscode.commands.registerCommand('ojo-plugin.helloWorld', () => {
 			vscode.window.showInformationMessage('Hello World from ojo-plugin!');
 		});
 		const openWebDisposable = vscode.commands.registerCommand('ojo-plugin.openWeb', async () => {
-			await openWebWithOptionalTicket();
+			await openProjectInBuiltinBrowser();
 		});
 
 		// 状态栏项：保持扩展常驻，便于用户快速打开 Web
 		const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 		statusBarItem.command = 'ojo-plugin.openWeb';
 		statusBarItem.text = '$(globe) Ojo';
-		statusBarItem.tooltip = 'Ojo: 打开 Web 并同步登录';
+		statusBarItem.tooltip = 'Ojo: 选择项目并在内置浏览器打开';
 		statusBarItem.show();
 		context.subscriptions.push(statusBarItem);
+		registerActivityBarProjectLauncher(context);
 
 		context.subscriptions.push(disposable);
 		context.subscriptions.push(openWebDisposable);
@@ -60,6 +59,41 @@ export function activate(context: vscode.ExtensionContext) {
 		void vscode.window.showErrorMessage(`Ojo 插件启动失败: ${String(err)}`);
 		throw err;
 	}
+}
+
+class EmptyProjectsTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+	getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
+		return element;
+	}
+
+	getChildren(): vscode.ProviderResult<vscode.TreeItem[]> {
+		return [];
+	}
+}
+
+function registerActivityBarProjectLauncher(context: vscode.ExtensionContext): void {
+	const treeView = vscode.window.createTreeView(OJO_PROJECTS_VIEW_ID, {
+		treeDataProvider: new EmptyProjectsTreeDataProvider(),
+		showCollapseAll: false,
+	});
+
+	let suppressFirstVisibleEvent = treeView.visible;
+	const disposable = treeView.onDidChangeVisibility((event) => {
+		if (suppressFirstVisibleEvent && !event.visible) {
+			suppressFirstVisibleEvent = false;
+			return;
+		}
+		if (!event.visible) {
+			return;
+		}
+		if (suppressFirstVisibleEvent) {
+			suppressFirstVisibleEvent = false;
+			return;
+		}
+		void vscode.commands.executeCommand('ojo-plugin.openWeb');
+	});
+
+	context.subscriptions.push(treeView, disposable);
 }
 
 async function configureBuiltinBrowserOpeners() {
@@ -149,7 +183,7 @@ async function readJsonBody(req: IncomingMessage): Promise<unknown> {
 
 async function handleWorkspaceSync(req: IncomingMessage, res: ServerResponse): Promise<void> {
 	const config = vscode.workspace.getConfiguration('ojoPlugin');
-	const webBaseUrl = config.get<string>('webBaseUrl', 'https://aneway.ai');
+	const webBaseUrl = config.get<string>('webBaseUrl', 'https://ojo.art');
 	const origin = getRequestOrigin(req);
 
 	if (!isAllowedOrigin(origin, webBaseUrl)) {
@@ -253,11 +287,12 @@ export function deactivate() {
 	server = undefined;
 }
 
-async function buildWebLaunchUrl(): Promise<string> {
+async function buildWebLaunchUrl(targetPath?: string): Promise<string> {
 	const config = vscode.workspace.getConfiguration('ojoPlugin');
-	const accountApiBaseUrl = config.get<string>('accountApiBaseUrl', 'https://aneway.ai');
-	const webBaseUrl = config.get<string>('webBaseUrl', 'https://aneway.ai');
-	const webTargetPath = config.get<string>('webTargetPath', '/');
+	const accountApiBaseUrl = config.get<string>('accountApiBaseUrl', 'https://ojo.art');
+	const webBaseUrl = config.get<string>('webBaseUrl', 'https://ojo.art');
+	const defaultWebTargetPath = config.get<string>('webTargetPath', '/p/4f7f14a3-3f80-48cc-a142-0af392ee0688');
+	const webTargetPath = targetPath && targetPath.trim().length > 0 ? targetPath : defaultWebTargetPath;
 	const loginBridgePath = config.get<string>('loginBridgePath', '/login/ide/handoff');
 	activeSyncToken = generateSyncToken();
 	const launchQuery = buildIdeLaunchQueryParams({
@@ -285,15 +320,15 @@ async function buildWebLaunchUrl(): Promise<string> {
 	return launchResult.url;
 }
 
-async function openWebInBuiltinBrowser(): Promise<void> {
+async function openWebInBuiltinBrowser(targetPath?: string): Promise<void> {
 	try {
-		const url = await buildWebLaunchUrl();
+		const url = await buildWebLaunchUrl(targetPath);
 		// 使用 IDE 内置 Simple Browser，保持扩展常驻
 		await vscode.commands.executeCommand('simpleBrowser.show', url);
 	} catch (error) {
 		console.warn('[ojo-plugin] failed to open built-in browser, fallback to external:', error);
 		try {
-			const url = await buildWebLaunchUrl();
+			const url = await buildWebLaunchUrl(targetPath);
 			await vscode.env.openExternal(vscode.Uri.parse(url));
 		} catch (e) {
 			console.error('[ojo-plugin] open web fallback failed:', e);
@@ -301,16 +336,47 @@ async function openWebInBuiltinBrowser(): Promise<void> {
 	}
 }
 
+function createProjectPickerUi(): ProjectPickerUi {
+	return {
+		showQuickPick: async (items) =>
+			vscode.window.showQuickPick(items, {
+				title: '选择 Ojo 项目',
+				placeHolder: '选择项目后将在 IDE 内置浏览器中打开',
+				ignoreFocusOut: true,
+			}),
+		showInputBox: async (options) =>
+			vscode.window.showInputBox({
+				prompt: options.prompt,
+				placeHolder: options.placeHolder,
+				ignoreFocusOut: options.ignoreFocusOut ?? true,
+				title: '输入 Ojo Project ID',
+			}),
+	};
+}
 
-async function openWebWithOptionalTicket() {
+async function openProjectInBuiltinBrowser() {
+	if (projectPickerInProgress) {
+		return;
+	}
+	projectPickerInProgress = true;
 	try {
-		const url = await buildWebLaunchUrl();
-		const opened = await vscode.env.openExternal(vscode.Uri.parse(url));
-		if (!opened) {
-			vscode.window.showWarningMessage('Unable to open web page.');
+		const config = vscode.workspace.getConfiguration('ojoPlugin');
+		const syncCliCommand = config.get<string>('syncCliCommand', 'ojo') || 'ojo';
+		const projectId = await selectProjectIdFromCli(syncCliCommand, createProjectPickerUi(), {
+			onWarning: (message) => {
+				void vscode.window.showWarningMessage(message);
+			},
+			logger: console,
+		});
+		if (!projectId) {
+			return;
 		}
+
+		await openWebInBuiltinBrowser(buildProjectTargetPath(projectId));
 	} catch (error) {
-		console.error('[ojo-plugin] open web error:', error);
-		vscode.window.showErrorMessage(`打开 Web 失败: ${String(error)}`);
+		console.error('[ojo-plugin] open project in built-in browser failed:', error);
+		void vscode.window.showErrorMessage(`打开项目失败: ${String(error)}`);
+	} finally {
+		projectPickerInProgress = false;
 	}
 }

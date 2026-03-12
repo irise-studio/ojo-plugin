@@ -4,10 +4,15 @@ VS Code extension for Ojo integration.
 
 ## Commands
 
-- `Ojo: Open Web (Sync Login)` (`ojo-plugin.openWeb`)
+- `Ojo: Open Project (Built-in Browser)` (`ojo-plugin.openWeb`)
+  - Click from status bar `$(globe) Ojo` or activity bar `Ojo` icon.
+  - Shows a project picker (loaded via `ojo project list --json --page-size 100`).
+  - Selecting a project opens `/p/{projectId}` in IDE built-in browser.
+  - If project list fetch fails or returns empty, falls back to manual Project ID input.
   - Reads CLI auth state from `~/.ojo/session.json`.
   - If auth state is valid, requests `/api/auth/v1/create_ide_handoff` and opens the login bridge URL with `ticket`.
   - If auth state is missing/invalid or handoff fails, opens the target web URL directly.
+  - Launch URL includes IDE context query params: `ide_in_app`, `ide_client`, `ide_local_server`, `ide_sync_token`.
 
 ## CLI Auth State Contract
 

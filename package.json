@@ -26,9 +26,45 @@
       },
       {
         "command": "ojo-plugin.openWeb",
-        "title": "Ojo: Open Web (Sync Login)"
+        "title": "Ojo: Open Project (Built-in Browser)",
+        "icon": {
+          "light": "media/ojo.svg",
+          "dark": "media/ojo.svg"
+        }
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ojo-plugin",
+          "title": "Ojo",
+          "icon": "media/ojo.svg"
+        }
+      ]
+    },
+    "views": {
+      "ojo-plugin": [
+        {
+          "id": "ojo-plugin.projectsView",
+          "name": "Projects"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "ojo-plugin.projectsView",
+        "contents": "点击 Activity Bar 的 Ojo 图标会弹出项目选择器。\\n[打开项目](command:ojo-plugin.openWeb)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "ojo-plugin.openWeb",
+          "when": "view == ojo-plugin.projectsView",
+          "group": "navigation"
+        }
+      ]
+    },
     "configuration": {
       "title": "Ojo Plugin",
       "properties": {
@@ -41,17 +77,17 @@
         },
         "ojoPlugin.accountApiBaseUrl": {
           "type": "string",
-          "default": "https://aneway.ai",
+          "default": "https://ojo.art",
           "description": "Base URL of the account API service used for create_ide_handoff."
         },
         "ojoPlugin.webBaseUrl": {
           "type": "string",
-          "default": "https://aneway.ai",
+          "default": "https://ojo.art",
           "description": "Base URL of the web app."
         },
         "ojoPlugin.webTargetPath": {
           "type": "string",
-          "default": "/",
+          "default": "/p/4f7f14a3-3f80-48cc-a142-0af392ee0688",
           "description": "Default web path to open when triggering web login sync."
         },
         "ojoPlugin.loginBridgePath": {
@@ -78,11 +114,6 @@
           "type": "string",
           "default": "ojo",
           "description": "CLI command used for workspace sync."
-        },
-        "ojoPlugin.autoOpenBrowserOnActivate": {
-          "type": "boolean",
-          "default": true,
-          "description": "扩展激活时自动在 IDE 内置浏览器中打开 Web 应用，保持扩展常驻。"
         }
       }
     }

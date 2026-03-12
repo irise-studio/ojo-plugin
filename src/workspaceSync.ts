@@ -33,6 +33,7 @@ export interface SyncSuccessPayload {
 	path: string;
 	workspaceHash?: string;
 	durationMs: number;
+	logs?: string[];
 }
 
 export interface SyncErrorPayload {
@@ -48,6 +49,7 @@ export interface SyncErrorPayload {
 		| 'CLI_PULL_FAILED'
 		| 'INTERNAL_ERROR';
 	message: string;
+	logs?: string[];
 }
 
 export type SyncResponse =
@@ -72,11 +74,16 @@ export interface RunWorkspaceSyncOptions {
 	fileSystem?: FileSystemLike;
 }
 
-function makeError(status: number, code: SyncErrorPayload['code'], message: string): SyncResponse {
+function makeError(
+	status: number,
+	code: SyncErrorPayload['code'],
+	message: string,
+	logs?: string[],
+): SyncResponse {
 	return {
 		ok: false,
 		status,
-		error: { code, message },
+		error: logs && logs.length > 0 ? { code, message, logs } : { code, message },
 	};
 }
 
@@ -160,48 +167,112 @@ function extractLastJsonObject(stdout: string): CliSyncPayload | undefined {
 	return undefined;
 }
 
-function mapCliFailure(error: unknown): SyncResponse {
+function summarizeText(text: string, maxLength = 600): string {
+	const normalized = text.replace(/\s+/g, ' ').trim();
+	if (normalized.length <= maxLength) {
+		return normalized;
+	}
+	return `${normalized.slice(0, maxLength)}...(truncated)`;
+}
+
+function formatCliFailureMessage(error: unknown): string {
+	const stdout = isNodeError(error) && 'stdout' in error && typeof error.stdout === 'string' ? error.stdout.trim() : '';
+	const stderr = isNodeError(error) && 'stderr' in error && typeof error.stderr === 'string' ? error.stderr.trim() : '';
+	const exitCode = isNodeError(error) && 'code' in error ? error.code : undefined;
+	const signal = isNodeError(error) && 'signal' in error ? error.signal : undefined;
+	const fallbackMessage = error instanceof Error ? error.message : String(error);
+
+	const parts: string[] = [];
+	if (typeof exitCode === 'number') {
+		parts.push(`exit_code=${exitCode}`);
+	}
+	if (typeof signal === 'string' && signal.length > 0) {
+		parts.push(`signal=${signal}`);
+	}
+	if (stderr.length > 0) {
+		parts.push(`stderr=${summarizeText(stderr)}`);
+	}
+	if (stdout.length > 0) {
+		parts.push(`stdout=${summarizeText(stdout)}`);
+	}
+	if (parts.length === 0) {
+		parts.push(summarizeText(fallbackMessage || '同步失败，请稍后重试'));
+	}
+	return parts.join(' | ');
+}
+
+function pushLog(logs: string[], message: string): void {
+	logs.push(`[workspace-sync] ${message}`);
+}
+
+function mapCliFailure(error: unknown, projectId: string, logs: string[]): SyncResponse {
 	if (isNodeError(error) && error.code === 'ENOENT') {
-		return makeError(500, 'CLI_NOT_FOUND', '未找到 ojo 命令，请先安装 CLI');
+		pushLog(logs, 'cli command not found');
+		return makeError(500, 'CLI_NOT_FOUND', '未找到 ojo 命令，请先安装 CLI', logs);
 	}
 
 	const stderr = isNodeError(error) && 'stderr' in error && typeof error.stderr === 'string' ? error.stderr : '';
-	const message = stderr.trim() || (error instanceof Error ? error.message : String(error));
-	if (/login|登录|auth|unauthor|session|401|未登录/i.test(message)) {
-		return makeError(401, 'CLI_AUTH_REQUIRED', 'CLI 未登录，请先执行 ojo 登录');
+	const stdout = isNodeError(error) && 'stdout' in error && typeof error.stdout === 'string' ? error.stdout : '';
+	const combined = `${stderr}\n${stdout}\n${error instanceof Error ? error.message : String(error)}`;
+	pushLog(logs, `cli failure summary: ${formatCliFailureMessage(error)}`);
+	if (/login|登录|auth|unauthor|session|401|未登录/i.test(combined)) {
+		return makeError(401, 'CLI_AUTH_REQUIRED', 'CLI 未登录，请先执行 ojo 登录', logs);
 	}
-	return makeError(500, 'CLI_PULL_FAILED', message || '同步失败，请稍后重试');
+	if (/status code 403|forbidden|permission|denied|权限|无权限/i.test(combined)) {
+		return makeError(
+			403,
+			'CLI_PULL_FAILED',
+			`项目拉取被拒绝(403)，请确认当前账号对项目 ${projectId} 有访问权限，或重新登录 ojo。详情: ${formatCliFailureMessage(error)}`,
+			logs,
+		);
+	}
+	return makeError(500, 'CLI_PULL_FAILED', formatCliFailureMessage(error), logs);
 }
 
 export async function runWorkspaceSync(options: RunWorkspaceSyncOptions): Promise<SyncResponse> {
 	const workspaceRoot = options.workspaceRoot;
 	const fileSystem = options.fileSystem ?? fs;
 	const execFileImpl = options.execFileImpl ?? execFileAsync;
+	const logs: string[] = [];
 	if (!workspaceRoot) {
-		return makeError(422, 'NO_WORKSPACE_OPEN', '请先打开本地工作区');
+		pushLog(logs, 'workspace root is empty');
+		return makeError(422, 'NO_WORKSPACE_OPEN', '请先打开本地工作区', logs);
 	}
 
 	const outputPath = path.join(workspaceRoot, SYNC_SUBDIR);
+	pushLog(logs, `start pull: projectId=${options.projectId} workspaceRoot=${workspaceRoot}`);
 	const shouldPrompt = await directoryExistsAndNonEmpty(outputPath, fileSystem);
 	if (shouldPrompt) {
+		pushLog(logs, `target dir not empty: ${outputPath}`);
 		const confirmed = await options.confirmOverwrite();
 		if (!confirmed) {
-			return makeError(409, 'USER_CANCELLED', '用户取消同步');
+			pushLog(logs, 'user cancelled overwrite');
+			return makeError(409, 'USER_CANCELLED', '用户取消同步', logs);
 		}
+		pushLog(logs, 'user confirmed overwrite');
 	}
 
 	const startTime = Date.now();
 	try {
-		const { stdout } = await execFileImpl(options.cliCommand, [
+		const cliArgs = [
 			'workspace',
 			'pull',
 			options.projectId,
 			'--path',
 			workspaceRoot,
 			'--json',
-		]);
+		];
+		pushLog(logs, `exec: ${options.cliCommand} ${cliArgs.join(' ')}`);
+		const { stdout, stderr } = await execFileImpl(options.cliCommand, cliArgs);
+		if (stderr.trim().length > 0) {
+			pushLog(logs, `stderr: ${summarizeText(stderr)}`);
+		}
+		if (stdout.trim().length > 0) {
+			pushLog(logs, `stdout: ${summarizeText(stdout)}`);
+		}
 		const payload = extractLastJsonObject(stdout);
 		const durationMs = Date.now() - startTime;
+		pushLog(logs, `pull success in ${durationMs}ms`);
 		return {
 			ok: true,
 			status: 200,
@@ -211,10 +282,11 @@ export async function runWorkspaceSync(options: RunWorkspaceSyncOptions): Promis
 				workspaceHash:
 					typeof payload?.workspace_hash === 'string' ? payload.workspace_hash : options.requestedWorkspaceHash,
 				durationMs,
+				logs,
 			},
 		};
 	} catch (error) {
-		return mapCliFailure(error);
+		return mapCliFailure(error, options.projectId, logs);
 	}
 }
 

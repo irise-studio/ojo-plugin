@@ -55,9 +55,9 @@ function buildCreateHandoffEndpoint(config: HandoffConfig): string {
 	return new URL('/api/auth/v1/create_ide_handoff', base).toString();
 }
 
-async function parseCreateHandoffResponse(response: Response): Promise<CreateHandoffResponse | undefined> {
+function parseCreateHandoffResponse(bodyText: string): CreateHandoffResponse | undefined {
 	try {
-		const payload: unknown = await response.json();
+		const payload: unknown = JSON.parse(bodyText);
 		if (!payload || typeof payload !== 'object') {
 			return undefined;
 		}
@@ -65,6 +65,14 @@ async function parseCreateHandoffResponse(response: Response): Promise<CreateHan
 	} catch {
 		return undefined;
 	}
+}
+
+function summarizeForLog(text: string, maxLength = 800): string {
+	const normalized = text.replace(/\s+/g, ' ').trim();
+	if (normalized.length <= maxLength) {
+		return normalized;
+	}
+	return `${normalized.slice(0, maxLength)}...(truncated)`;
 }
 
 function buildBridgeUrl(config: HandoffConfig, ticket: string): string {
@@ -95,9 +103,9 @@ export async function resolveWebLaunchUrl(
 			reason: 'no_auth_state',
 		};
 	}
+	const endpoint = buildCreateHandoffEndpoint(config);
 
 	try {
-		const endpoint = buildCreateHandoffEndpoint(config);
 		const response = await fetchImpl(endpoint, {
 			method: 'POST',
 			headers: {
@@ -110,16 +118,22 @@ export async function resolveWebLaunchUrl(
 				client: 'cli',
 			}),
 		});
+		const responseText = await response.text();
+		const responseSummary = responseText ? summarizeForLog(responseText) : '<empty>';
+		const payload = parseCreateHandoffResponse(responseText);
 
 		if (!response.ok) {
-			logger.warn(`[ojo-plugin] create handoff failed with status ${response.status}`);
+			logger.warn(
+				`[ojo-plugin] create handoff failed: status=${response.status} statusText=${response.statusText || 'unknown'} endpoint=${endpoint} body=${responseSummary}`,
+			);
 			return fallback();
 		}
 
-		const payload = await parseCreateHandoffResponse(response);
 		const ticket = payload?.data?.ticket;
 		if (payload?.code !== 0 || !ticket) {
-			logger.warn(`[ojo-plugin] create handoff rejected with code ${String(payload?.code ?? 'unknown')}`);
+			logger.warn(
+				`[ojo-plugin] create handoff rejected: code=${String(payload?.code ?? 'unknown')} errmsg=${String(payload?.errmsg ?? 'unknown')} endpoint=${endpoint} body=${responseSummary}`,
+			);
 			return fallback();
 		}
 
@@ -129,7 +143,7 @@ export async function resolveWebLaunchUrl(
 			reason: 'ticket_injected',
 		};
 	} catch (error) {
-		logger.warn(`[ojo-plugin] create handoff request error: ${String(error)}`);
+		logger.warn(`[ojo-plugin] create handoff request error: endpoint=${endpoint} error=${String(error)}`);
 		return fallback();
 	}
 }
