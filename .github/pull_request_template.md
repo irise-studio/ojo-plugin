@@ -1,7 +1,7 @@
 <!-- 模板：拷贝到每个业务 repo 的 .github/pull_request_template.md -->
 
 ## Intent（这个 PR 想做什么）
-<!-- 一句话说明意图。必须 link issue：Closes #<issue> -->
+<!-- PR 标题主体必须用中文。Issue 标题也必须是中文。必须用 Fixes/Closes/Resolves link issue，让 GitHub 自动填 Linked pull requests。 -->
 Closes #
 
 ## Changes（改了什么）
@@ -20,7 +20,9 @@ Closes #
 Decision:
 
 ## Checklist
-- [ ] 有 linked issue
+- [ ] Issue 标题是中文
+- [ ] PR 标题主体是中文（可保留 `[codex]` / `feat:` / `fix:` / `docs:` 标志）
+- [ ] 使用 `Fixes #N` / `Closes #N` / `Resolves #N` 关联 issue
 - [ ] 已读 team-os/context/active-risks.md，无冲突
 - [ ] 高风险改动已写 decision
 - [ ] 已 ack 相关 inbox 提醒（如有）

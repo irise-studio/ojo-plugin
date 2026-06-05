@@ -27,7 +27,10 @@ Issue -> Project -> Context -> PR -> Review -> Release -> Ship Log / Context Rec
 
 ## 工作规则
 - 没有 issue，不开工；没有 linked issue，不合 PR。
-- PR 必须用 `Fixes #123`、`Closes #123` 或 `Issue: #123` 关联 issue。
+- Issue 标题必须用中文说明需求 / 问题。
+- PR 标题可以保留 `[codex]`、`feat:`、`fix:`、`docs:` 等标志，但标题主体必须用中文说明交付内容。
+- PR 必须用 `Fixes #123`、`Closes #123` 或 `Resolves #123` 关联 issue；这样 GitHub 才会自动填 issue 行的 `Linked pull requests`。
+- Product Engineering OS 以 issue 为主行；PR 是 issue 下的交付证据，不要为每个 PR 单独建 Project 行。
 - 改 **产品行为 / 架构 / API / DB schema / 权限 / 计费 / agent 行为** 必须有 decision。
 - 收到影响提醒（inbox / PR comment）必须 ack。
 - PR 必须说明 intent、risk、测试证据、decision/context 链接（用 PR 模板）。
@@ -36,6 +39,7 @@ Issue -> Project -> Context -> PR -> Review -> Release -> Ship Log / Context Rec
 
 ## Review / Decision / Context Sync
 - Review 先看正确性和回归风险，再看缺 decision/context、跨 repo 影响、测试和 rollout。
+- Review 时先确认 linked issue 是中文标题，PR body 使用 `Fixes` / `Closes` / `Resolves`，PR 标题主体也是中文。
 - 需要 decision 的变更先写 `team-os/docs/decisions/NNNN-short-title.md`，再登记 `team-os/context/current-decisions.md`。
 - 飞书讨论沉淀用 Context Sync preview，先看候选内容，再决定是否 apply 或建 issue。
 - 不要把未确认群聊、密钥、token、私钥、原始聊天噪音写进长期 context。
