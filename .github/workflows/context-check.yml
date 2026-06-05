@@ -1,0 +1,53 @@
+# 模板：拷贝到每个业务 repo 的 .github/workflows/context-check.yml
+#
+# 这是 Notion MVP 第 1 周的"PR 自动检测"骨架。它做轻量、可独立运行的检查：
+#   1) PR 是否有 linked issue
+#   2) PR 是否动到高风险文件（API / schema / 权限 / agent 协议）
+#   3) PR 描述是否声明了 intent 与 risk
+# 更复杂的"跨 repo 影响面 / 同文件冲突 / 缺 decision"由 Context Bot（中心服务）完成，
+# 见 team-os/README.md 的 Context Bot 章节。
+
+name: context-check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  context-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require linked issue
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          echo "$BODY" | grep -Eiq '(closes|fixes|resolves|refs)[[:space:]]*#[0-9]+|#[0-9]+' \
+            && echo "✅ linked issue found" \
+            || { echo "::error::PR 必须 link issue（Closes #N）。没有 issue 不合 PR。"; exit 1; }
+
+      - name: Require intent & risk sections
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          echo "$BODY" | grep -qi 'Intent'  || { echo "::error::PR 描述缺少 Intent。"; exit 1; }
+          echo "$BODY" | grep -qi 'Risk'    || { echo "::error::PR 描述缺少 Risk。"; exit 1; }
+          echo "✅ intent & risk present"
+
+      - name: Flag high-risk file changes
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          changed="$(git diff --name-only "$base" "$head")"
+          echo "Changed files:"; echo "$changed"
+          # 高风险路径：动到契约/schema/权限/agent 协议时提示需 decision（warning，不阻断）
+          if echo "$changed" | grep -Eq '(^|/)(api|proto)/|schema\.prisma|/migrations/|/ent/|auth|billing|agent'; then
+            echo "::warning::改动涉及高风险路径（api/proto/schema/权限/agent）。请确认已写 decision 并通知下游 owner（见 team-os/maps/dependency-map.yml）。"
+          fi
