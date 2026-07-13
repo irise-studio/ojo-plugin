@@ -16,13 +16,11 @@ Closes #
 - [ ] 跨 repo 影响（说明下游）：
 
 ## Decision（如适用）
-<!-- 若包含上述任一项，链接 team-os/docs/decisions/NNNN-*.md -->
+<!-- 若包含上述任一项，链接仓库内的 decision 记录 -->
 Decision:
 
 ## Checklist
 - [ ] Issue 标题是中文
 - [ ] PR 标题主体是中文（可保留 `[codex]` / `feat:` / `fix:` / `docs:` 标志）
 - [ ] 使用 `Fixes #N` / `Closes #N` / `Resolves #N` 关联 issue
-- [ ] 已读 team-os/context/active-risks.md，无冲突
 - [ ] 高风险改动已写 decision
-- [ ] 已 ack 相关 inbox 提醒（如有）
