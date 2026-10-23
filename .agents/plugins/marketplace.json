@@ -1,0 +1,20 @@
+{
+  "name": "irise-studio",
+  "interface": {
+    "displayName": "Irise Studio"
+  },
+  "plugins": [
+    {
+      "name": "irise-web",
+      "source": {
+        "source": "local",
+        "path": "./codex-plugin"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Engineering"
+    }
+  ]
+}

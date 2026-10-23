@@ -1,0 +1,16 @@
+
+# 默认所有改动
+*                       @jacob953
+
+# 契约 / 接口（改动需影响面分析，建议多人 review）
+/api/                   @jacob953 @jacob953
+/proto/                 @jacob953 @jacob953
+
+# 数据库 / schema
+/**/schema.prisma       @jacob953 @jacob953
+/ent/                   @jacob953 @jacob953
+/migrations/            @jacob953 @jacob953
+
+# 部署 / 基础设施
+/deployment/            @jacob953
+/.github/workflows/     @jacob953

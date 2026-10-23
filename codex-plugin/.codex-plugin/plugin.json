@@ -1,0 +1,28 @@
+{
+  "name": "irise-web",
+  "version": "0.1.0+codex.20261022203456",
+  "description": "Prepare local websites for OJO optimization: route non-OJO apps through conversion, validate prototypes and snapshots, publish authorized artifacts, and verify artifacts through CLI/API readback. Local Irise Web canvas startup and preview are temporarily disabled.",
+  "author": {
+    "name": "Irise Studio",
+    "url": "https://github.com/irise-studio"
+  },
+  "homepage": "https://github.com/irise-studio/ojo-plugin/tree/main/codex-plugin",
+  "repository": "https://github.com/irise-studio/ojo-plugin",
+  "keywords": ["irise", "ojo", "cli", "web"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "OJO",
+    "shortDescription": "Optimize local sites with OJO",
+    "longDescription": "Use OJO to optimize an existing local website or app. Start non-OJO projects with conversion preflight and a behavior-preserving workspace based on a real export; validate builds and default snapshots, upload to an explicit authorized target, and verify artifacts through CLI/API readback. Preserve proposal-before-design-change approval and analysis-only limits. Missing project IDs do not block source preflight. Remote proposals and approved execution use verified chat/query commands. Local Irise Web canvas startup, canvas export, dropped-resource publication, and localhost preview are temporarily disabled, so the plugin never requests an irise-web checkout or claims canvas visual verification.",
+    "developerName": "Irise Studio",
+    "category": "Engineering",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://staging.ojo.dev",
+    "defaultPrompt": [
+      "\u4f7f\u7528 OJO \u4f18\u5316\u5f53\u524d\u672c\u5730\u9879\u76ee\uff1a\u5148\u68c0\u67e5\u517c\u5bb9\u6027\uff0c\u5fc5\u8981\u65f6\u8f6c\u6362\uff0c\u5e76\u4e0a\u4f20\u5230\u6211\u6307\u5b9a\u7684 OJO \u9879\u76ee\uff1b\u5148\u7ed9\u51fa\u4f18\u5316\u65b9\u6848\uff0c\u7b49\u6211\u786e\u8ba4\u540e\u518d\u4fee\u6539\u9875\u9762\u3002",
+      "\u8ba9 OJO \u4e3a\u6307\u5b9a\u9879\u76ee\u5148\u8f93\u51fa\u4f18\u5316\u65b9\u6848\uff0c\u8bfb\u53d6\u5b9e\u9645\u56de\u590d\u5e76\u7b49\u6211\u786e\u8ba4\u540e\uff0c\u518d\u53d1\u9001\u6267\u884c\u8bf7\u6c42\u3002",
+      "Download this prototype workspace and validate its manifests without starting a local canvas."
+    ],
+    "brandColor": "#6C5CE7"
+  }
+}

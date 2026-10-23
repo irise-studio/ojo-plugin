@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Irise Prototype"
+  short_description: "Server-aligned local prototype build gate"
+  default_prompt: "Use $build-irise-prototype to build this local Irise prototype through the server-aligned gate."
