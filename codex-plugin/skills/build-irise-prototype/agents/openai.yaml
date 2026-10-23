@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Irise Prototype"
+  short_description: "Build and validate an OJO prototype locally"
+  default_prompt: "Use $build-irise-prototype to build and validate this local OJO prototype with its checked-in export scripts."

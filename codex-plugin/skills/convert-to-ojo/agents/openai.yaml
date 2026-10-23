@@ -1,0 +1,4 @@
+interface:
+  display_name: "Convert to OJO"
+  short_description: "Prepare local apps for optimization in OJO"
+  default_prompt: "Use $convert-to-ojo to prepare this local project for OJO optimization, validate a behavior-preserving conversion, and upload to my specified target when authorized; preserve any proposal approval step."

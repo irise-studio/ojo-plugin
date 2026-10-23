@@ -1,0 +1,4 @@
+interface:
+  display_name: "OJO"
+  short_description: "Import local apps and optimize them with OJO"
+  default_prompt: "Use $ojo-workspace to optimize this local project, starting with convert-to-ojo if needed; honor my import/upload scope, use verified chat/query when I request OJO remote work, and obtain my confirmation before executing a proposal when requested."
