@@ -31,6 +31,7 @@ The plugin is displayed as **OJO**.
 
 - Read access to the `irise-studio/ojo-plugin` repository;
 - Node.js 20 or newer;
+- automatic installation also requires npm, Git, npm/GitHub network access, and an official Codex CLI supporting `codex plugin add` (verified with `0.163.0`);
 - `@touchine/ojo` CLI `>=1.0.9 <2.0.0`, available as `ojo` on `PATH` or selected with `OJO_CLI_BIN`;
 - a valid OJO login and the relevant project permissions for synchronization, publication, remote chat, and query operations.
 
@@ -50,15 +51,51 @@ This repository distributes the Codex plugin, not the OJO CLI. The CLI provides 
 
 ## Installation
 
+### Automatic installation
+
+Run:
+
+```bash
+npx -y @touchine/ojo-plugin@latest install
+```
+
+Alternatively, install directly from GitHub:
+
+```bash
+npx -y github:irise-studio/ojo-plugin#main install
+```
+
+The installer checks Node/Codex and preserves a CLI that passes the version and command checks. Only a missing CLI triggers `npm install --global @touchine/ojo@1.0.9`. It then registers or refreshes this repository's marketplace, runs `codex plugin add ojo@irise-studio`, and reads back installed/enabled state. Rerunning refreshes the same source and verifies again.
+
+Append `--dry-run` to check prerequisites and preview commands without running npm installs or marketplace writes. Login is separate. Start a new Codex task after installation; run `ojo auth login` when remote project access needs authentication.
+
+- `OJO_CLI_BIN` selects a custom executable. Fix or unset an invalid value; the installer never overwrites it.
+- Implicit CLI lookup excludes npm-injected cache and `node_modules/.bin` directories. To intentionally use a project-local CLI, set its full path in `OJO_CLI_BIN` and ensure later Codex tasks inherit that variable.
+- An incompatible existing CLI requires an explicit decision to install a compatible version; the installer never silently downgrades it.
+- If npm reports a permission error, fix the user's global npm directory permissions and retry. A CLI available only inside the current npx process is insufficient.
+- If `ojo` is missing after npm installation, inspect `npm prefix -g` and add `<prefix>/bin` on macOS/Linux or `<prefix>` on Windows to `PATH`, then retry.
+- If an existing `irise-studio` marketplace points elsewhere, installation stops before changes. Inspect `codex plugin marketplace list`. Only remove the old source manually after confirming it and its plugins are no longer needed; the installer never replaces it automatically.
+- Windows, macOS, and Linux use the same installation entrypoint. Windows CI verifies first/repeat installation and the standalone checker with real Codex/OJO npm releases; isolated installation acceptance has also passed on macOS.
+- On Windows, the OJO npm `.cmd` shim only locates the JavaScript bin declared by `@touchine/ojo`. The checker and installer run that bin directly with Node, without interpreting batch text. Custom `OJO_CLI_BIN` values may select a JavaScript file or native executable; arbitrary `.cmd`/`.bat` wrappers are unsupported.
+
+### Manual installation
+
+Install and check the OJO CLI as described above, then:
+
 1. Add this repository's marketplace from a terminal:
 
    ```bash
    codex plugin marketplace add irise-studio/ojo-plugin --ref main
    ```
 
-2. Start Codex and enter `/plugins` to open the plugin directory.
-3. Select the **Irise Studio** marketplace, open **OJO**, and install it.
-4. Start a new task after installation so that the plugin skills are loaded.
+2. With a Codex CLI supporting command-line installation, run:
+
+   ```bash
+   codex plugin add ojo@irise-studio
+   ```
+
+   Alternatively, start Codex, enter `/plugins`, select **Irise Studio**, open **OJO**, and install it.
+3. Start a new task after installation so that the plugin skills are loaded.
 
 Optional: inspect the configured marketplaces:
 

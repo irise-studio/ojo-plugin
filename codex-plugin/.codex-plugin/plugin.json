@@ -1,6 +1,6 @@
 {
   "name": "ojo",
-  "version": "0.1.1+codex.20261023",
+  "version": "0.1.2+codex.20261028",
   "description": "Prepare local websites for OJO optimization with @touchine/ojo: route non-OJO apps through conversion, validate prototypes and snapshots with export-native scripts, import authorized artifacts, and verify them through CLI/API readback. Local canvas startup and preview are disabled.",
   "author": {
     "name": "Irise Studio",

@@ -1,0 +1,15 @@
+{
+  "name": "@touchine/ojo-plugin",
+  "version": "0.1.0",
+  "description": "Install and verify the OJO Codex plugin and its OJO CLI dependency",
+  "type": "module",
+  "bin": { "ojo-plugin": "bin/ojo-plugin.mjs" },
+  "files": ["bin/", "lib/", "codex-plugin/scripts/check-ojo-cli.mjs", "codex-plugin/scripts/cli-contract.mjs", "codex-plugin/scripts/run-cli.mjs", "README.en.md"],
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test", "prepublishOnly": "npm test" },
+  "dependencies": { "cross-spawn": "^7.0.6" },
+  "publishConfig": { "access": "public" },
+  "repository": { "type": "git", "url": "git+https://github.com/irise-studio/ojo-plugin.git" },
+  "homepage": "https://github.com/irise-studio/ojo-plugin",
+  "bugs": { "url": "https://github.com/irise-studio/ojo-plugin/issues" }
+}
