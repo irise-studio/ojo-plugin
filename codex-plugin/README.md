@@ -53,13 +53,13 @@ node codex-plugin/scripts/check-ojo-cli.mjs
 
 ### 自动安装
 
-**首次 npm 发布尚未完成。发布后使用：**
+执行以下命令：
 
 ```bash
 npx -y @touchine/ojo-plugin@latest install
 ```
 
-首次发布前，在安装器变更合入 `main` 后可使用：
+也可以直接从 GitHub 安装：
 
 ```bash
 npx -y github:irise-studio/ojo-plugin#main install

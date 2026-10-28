@@ -53,13 +53,13 @@ This repository distributes the Codex plugin, not the OJO CLI. The CLI provides 
 
 ### Automatic installation
 
-**The first npm release is pending. After publication, use:**
+Run:
 
 ```bash
 npx -y @touchine/ojo-plugin@latest install
 ```
 
-Before the first release, after the installer change is merged into `main`, use:
+Alternatively, install directly from GitHub:
 
 ```bash
 npx -y github:irise-studio/ojo-plugin#main install

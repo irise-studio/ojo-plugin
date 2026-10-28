@@ -6,13 +6,13 @@
 
 ## Install with one command
 
-This repository provides the `@touchine/ojo-plugin` npm installer. **The first npm release is pending; the following npm command works after publication:**
+Use the `@touchine/ojo-plugin` npm installer:
 
 ```bash
 npx -y @touchine/ojo-plugin@latest install
 ```
 
-Before the first npm release, after this change is merged into `main`, run the same installer from GitHub:
+Alternatively, run the same installer directly from GitHub:
 
 ```bash
 npx -y github:irise-studio/ojo-plugin#main install
@@ -52,7 +52,7 @@ lib/install.mjs                   # installation and verification flow
 
 ## Maintainer release
 
-The installer has its own npm version; plugin assets continue to come from the Git marketplace. A maintainer with publishing access to the `@touchine` scope must publish the first release. Merging a PR does not publish to npm.
+The installer has its own npm version; plugin assets continue to come from the Git marketplace. Releases require publishing access to the `@touchine` scope. Merging a PR does not automatically publish to npm.
 
 ```bash
 npm ci
@@ -61,4 +61,4 @@ npm pack --dry-run
 npm publish --access public
 ```
 
-Review the package name, version, and packed contents before publishing. After publication, verify the npm command in a clean environment and remove the pending-release notice. There are no install lifecycle side effects; installation runs only when the executable is invoked.
+Review the package name, version, and packed contents before publishing. After publication, verify the npm command in a clean environment. There are no install lifecycle side effects; installation runs only when the executable is invoked.

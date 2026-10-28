@@ -6,13 +6,13 @@
 
 ## 一条命令安装
 
-本仓库提供 npm 安装器 `@touchine/ojo-plugin`。**首次 npm 发布尚未完成，以下 npm 命令在发布后可用：**
+使用 npm 安装器 `@touchine/ojo-plugin` 完成安装：
 
 ```bash
 npx -y @touchine/ojo-plugin@latest install
 ```
 
-首次发布前，本变更合入 `main` 后可直接从 GitHub 运行同一安装器：
+也可直接从 GitHub 运行同一安装器：
 
 ```bash
 npx -y github:irise-studio/ojo-plugin#main install
@@ -52,7 +52,7 @@ lib/install.mjs                   # 安装与验证流程
 
 ## 维护者发布
 
-安装器使用独立 npm 版本，插件资源仍由 Git marketplace 分发。首次发布需要具有 `@touchine` scope 发布权限的维护者完成；合入 PR 不等于 npm 已发布。
+安装器使用独立 npm 版本，插件资源仍由 Git marketplace 分发。由具有 `@touchine` scope 发布权限的维护者发布；合入 PR 不会自动发布 npm。
 
 ```bash
 npm ci
@@ -61,4 +61,4 @@ npm pack --dry-run
 npm publish --access public
 ```
 
-发布前检查 npm 包名、版本和打包内容；发布后在干净环境运行上方 npm 命令验收，再移除“首次 npm 发布尚未完成”的说明。安装器没有 npm lifecycle 安装副作用，只有显式运行入口才执行安装步骤。
+发布前检查 npm 包名、版本和打包内容；发布后在干净环境运行上方 npm 命令验收。安装器没有 npm lifecycle 安装副作用，只有显式运行入口才执行安装步骤。
