@@ -1,28 +1,44 @@
 {
   "name": "ojo",
-  "version": "0.1.2+codex.20261028",
-  "description": "Prepare local websites for OJO optimization with @touchine/ojo: route non-OJO apps through conversion, validate prototypes and snapshots with export-native scripts, import authorized artifacts, and verify them through CLI/API readback. Local canvas startup and preview are disabled.",
+  "version": "0.1.3+codex.20261028",
+  "description": "Connect local websites and apps to OJO for design optimization. Check project compatibility, prepare and validate prototypes, sync project files, and request design improvement proposals.",
   "author": {
     "name": "Irise Studio",
-    "url": "https://github.com/irise-studio"
+    "url": "https://ojo.art"
   },
-  "homepage": "https://github.com/irise-studio/ojo-plugin/tree/main/codex-plugin",
+  "homepage": "https://ojo.art",
   "repository": "https://github.com/irise-studio/ojo-plugin",
-  "keywords": ["irise", "ojo", "cli", "web"],
+  "keywords": [
+    "ojo",
+    "design",
+    "ui",
+    "ux",
+    "prototyping",
+    "web"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "OJO",
-    "shortDescription": "Optimize local sites with OJO",
-    "longDescription": "Use OJO to optimize an existing local website or app with @touchine/ojo >=1.0.9 <2.0.0. Start non-OJO projects with conversion preflight and a behavior-preserving workspace based on a real export; validate builds and default snapshots with the export's own scripts, import to an explicit authorized target, and verify artifacts through CLI/API readback. Preserve proposal-before-design-change approval and analysis-only limits. Missing project IDs do not block source preflight. Remote proposals and approved execution use verified chat/query commands. Local canvas startup and localhost preview are disabled, so the plugin never requests an irise-web checkout or claims canvas visual verification.",
+    "shortDescription": "Optimize web and app design",
+    "longDescription": "OJO helps developers and product teams improve the design of existing websites and apps. Check a local project's compatibility, prepare it for the OJO workflow, sync an OJO project's files, and validate prototypes and page states. Request design improvement proposals, review OJO's response, and approve changes before execution. Upload validated content to a project you select. Requires local execution, Node.js 20 or later, and a compatible OJO CLI. Remote features require an OJO account with access to the selected project. Local canvas preview is currently unavailable.",
     "developerName": "Irise Studio",
-    "category": "Engineering",
-    "capabilities": ["Interactive", "Read", "Write"],
-    "websiteURL": "https://staging.ojo.dev",
-    "defaultPrompt": [
-      "\u4f7f\u7528 OJO \u4f18\u5316\u5f53\u524d\u672c\u5730\u9879\u76ee\uff1a\u5148\u68c0\u67e5\u517c\u5bb9\u6027\uff0c\u5fc5\u8981\u65f6\u8f6c\u6362\uff0c\u5e76\u4e0a\u4f20\u5230\u6211\u6307\u5b9a\u7684 OJO \u9879\u76ee\uff1b\u5148\u7ed9\u51fa\u4f18\u5316\u65b9\u6848\uff0c\u7b49\u6211\u786e\u8ba4\u540e\u518d\u4fee\u6539\u9875\u9762\u3002",
-      "\u8ba9 OJO \u4e3a\u6307\u5b9a\u9879\u76ee\u5148\u8f93\u51fa\u4f18\u5316\u65b9\u6848\uff0c\u8bfb\u53d6\u5b9e\u9645\u56de\u590d\u5e76\u7b49\u6211\u786e\u8ba4\u540e\uff0c\u518d\u53d1\u9001\u6267\u884c\u8bf7\u6c42\u3002",
-      "Download this prototype workspace and validate its manifests without starting a local canvas."
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
     ],
-    "brandColor": "#6C5CE7"
-  }
+    "websiteURL": "https://ojo.art",
+    "defaultPrompt": [
+      "Check this local website's compatibility with OJO and explain the preparation steps.",
+      "Ask OJO for design improvements to my project. Show me the proposal and wait for approval before making changes.",
+      "Sync my OJO project's files and validate the prototype build and page state snapshots."
+    ],
+    "brandColor": "#6C5CE7",
+    "logo": "./assets/ojo-black.png",
+    "logoDark": "./assets/ojo-white.png",
+    "composerIcon": "./assets/ojo-black.png",
+    "composerIconDark": "./assets/ojo-white.png"
+  },
+  "requires_local_executor": true
 }
