@@ -42,8 +42,9 @@ copying skills directly would bypass the plugin manager. Neither is needed.
 Node's built-in tests cover failure boundaries, compatible/missing/explicit
 CLIs, old Codex, marketplace conflicts, reruns, and installed-state verification.
 Run the packed CLI and a real install twice with an isolated npm prefix and
-CODEX_HOME. Windows process launching is covered by cross-spawn; a real Windows
-acceptance run remains a stated limitation unless a Windows runner is available.
+CODEX_HOME. Windows process launching is covered by the native npm-bin resolver
+for OJO and cross-spawn for npm/Codex. A real Windows runner validates complete
+first/repeat installation with published Codex and OJO npm releases.
 The standalone checker uses a dependency-free Windows npm shim resolver. It
 finds the adjacent `@touchine/ojo` package and runs its declared JS bin through
 Node with an argument array. It never runs `cmd.exe`, reads batch instructions,

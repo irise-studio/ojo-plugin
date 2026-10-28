@@ -75,7 +75,7 @@ npx -y github:irise-studio/ojo-plugin#main install
 - 如果 npm 报目录权限错误，先修复用户的 npm 全局安装目录权限，再重试。不要依赖仅在当前 `npx` 进程中存在的 CLI。
 - 如果安装后找不到 `ojo`，用 `npm prefix -g` 确认目录：macOS/Linux 的 `<prefix>/bin` 或 Windows 的 `<prefix>` 需加入 `PATH`，然后重试。
 - 如果已有名为 `irise-studio` 的 marketplace 指向其他来源，安装器会在修改前停止。用 `codex plugin marketplace list` 检查；确认原来源及其插件不再需要后，才手动移除该来源并重试。安装器不会自动替换它。
-- 安装器适配 Windows 命令 shim；真实端到端验收目前在 macOS 完成。
+- Windows、macOS 和 Linux 使用相同安装入口。Windows CI 使用真实 Codex/OJO npm 版本验证完整首次安装、重复安装和独立检查脚本；macOS 也已完成隔离环境安装验收。
 - Windows 下的 OJO npm `.cmd` shim 只用于定位 `@touchine/ojo` 包声明的 JavaScript 入口，检查器与安装器直接用 Node 执行入口，不解释批处理文本。自定义 `OJO_CLI_BIN` 可指定 JavaScript 文件或原生可执行文件；任意 `.cmd`/`.bat` 包装脚本不受支持。
 
 ### 手动安装

@@ -93,3 +93,11 @@ global/local npm layouts, no batch execution, package identity/path validation,
 and corrupt-vs-missing CLI errors. Windows CI also exercises an actual packed
 installer with the official Codex npm release, auto-installs OJO 1.0.9, checks
 the real CLI and performs a repeat installation in isolated directories.
+
+CodeQL follow-up validation: 19 tests pass on Node 20/25; all three platform
+matrix jobs pass. Windows integration on commit 0572733 passed real first and
+repeat installation using official Codex 0.163.0 and auto-installed OJO 1.0.9,
+including the standalone checker's ten capabilities. CI run: 40685096651.
+CodeQL alert 1's PR instance is fixed. The initial Windows integration attempt
+failed because the fixture omitted creation of its custom CODEX_HOME; the
+fixture now creates that directory before invoking Codex.
