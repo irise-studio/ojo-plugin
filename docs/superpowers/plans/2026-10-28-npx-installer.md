@@ -49,7 +49,7 @@ Files: both root READMEs, both plugin READMEs, `.gitignore`.
 - [x] Run `npm pack`, execute its CLI via npx, and verify the shared checker.
 - [x] Use a temporary npm prefix and CODEX_HOME for real first/repeat installation;
   record exact results and any unavailable platform coverage.
-- [ ] Review the diff, request independent review, fix important findings, run
+- [x] Review the diff, request independent review, fix important findings, run
   focused validation, then commit/push and open a draft PR linked to Issue #6.
 
 Progress: work started after the user's confirmation of the proposed flow.
@@ -70,3 +70,10 @@ the added CI matrix validates that runner on Windows as well as macOS/Linux.
 Ruling: implicit lookup excludes every `node_modules/.bin` entry, since npm does
 not expose the original PATH. Intentionally persistent local CLIs use explicit
 `OJO_CLI_BIN`; otherwise the installer conservatively requires a global CLI.
+
+Final tarball acceptance from inside an npm project exposed inherited
+`npm_package_version`: OJO 1.0.9 reads that before its own package version.
+Both checker/installer regressions were observed RED; subprocess environments
+now remove only that npm metadata key so version checks use the installed CLI.
+Final local suite: 16/16 passing on Node 20 and Node 25. The first CI matrix
+passed on Windows, macOS, and Linux; delivery tracks the final commit's checks.

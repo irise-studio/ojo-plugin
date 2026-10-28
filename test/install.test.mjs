@@ -31,7 +31,7 @@ function environment(options = {}) {
     state.calls.push({ command, args, settings });
     if (command !== "codex" && command !== "npm") {
       if (state.cli === null) return { status: null, error: Object.assign(new Error("missing"), { code: "ENOENT" }) };
-      if (args[0] === "--version") return ok(state.cli);
+      if (args[0] === "--version") return ok(settings.env.npm_package_version || state.cli);
       return ok(state.brokenCli ? "missing subcommand" : help[args.slice(0, -1).join(" ")]);
     }
     if (args.includes("--help")) return state.oldCodex ? fail("unknown command") : ok("help");
@@ -156,6 +156,13 @@ test("npm-injected cache and local executables are removed from subprocess PATH"
   const { state, execute } = environment();
   execute({ env: { PATH: ["/cache/_npx/123/node_modules/.bin", "/project/node_modules/.bin", "/node_modules/.bin", "/usr/bin"].join(delimiter), npm_config_cache: "/cache" } });
   assert.equal(state.calls.every(({ settings }) => settings.env.PATH === "/usr/bin"), true);
+});
+
+test("an invoking project's npm version cannot override the installed OJO CLI version", () => {
+  const { state, execute } = environment();
+  execute({ env: { PATH: "/usr/bin", npm_package_version: "0.1.0" } });
+  assert.equal(state.installed, true);
+  assert.equal(state.mutations.some(([command]) => command === "npm"), false);
 });
 
 test("contract checks reject a missing command and accept a later stable 1.x release", () => {
