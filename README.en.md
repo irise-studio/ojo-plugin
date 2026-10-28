@@ -4,6 +4,24 @@
 
 # OJO Plugin Marketplace
 
+## Install with one command
+
+This repository provides the `@touchine/ojo-plugin` npm installer. **The first npm release is pending; the following npm command works after publication:**
+
+```bash
+npx -y @touchine/ojo-plugin@latest install
+```
+
+Before the first npm release, after this change is merged into `main`, run the same installer from GitHub:
+
+```bash
+npx -y github:irise-studio/ojo-plugin#main install
+```
+
+The installer checks prerequisites, preserves a compatible OJO CLI or installs the verified release when absent, registers the marketplace, installs OJO, and verifies its state. Start a new Codex task afterwards. Run `ojo auth login` separately when remote operations need authentication. Requires Node.js 20+, npm, Git, access to npm/GitHub, and an official Codex CLI supporting `codex plugin add` (verified with `0.163.0`).
+
+Append `--dry-run` to preview the installation commands, or replace `install` with `--help`. The installer stops on marketplace name conflicts, incompatible existing CLIs, or a global executable directory outside `PATH`. See the [plugin installation documentation](codex-plugin/README.en.md#installation) for requirements and manual fallback.
+
 ## Repository purpose
 
 This repository is the Irise Studio distribution repository for the OJO plugin for Codex. It maintains:
@@ -28,4 +46,19 @@ See [`codex-plugin/README.en.md`](codex-plugin/README.en.md) for installation in
 ```text
 .agents/plugins/marketplace.json  # Codex marketplace entry
 codex-plugin/                     # OJO plugin package for Codex
+bin/ojo-plugin.mjs                # npx installer entrypoint
+lib/install.mjs                   # installation and verification flow
 ```
+
+## Maintainer release
+
+The installer has its own npm version; plugin assets continue to come from the Git marketplace. A maintainer with publishing access to the `@touchine` scope must publish the first release. Merging a PR does not publish to npm.
+
+```bash
+npm ci
+npm test
+npm pack --dry-run
+npm publish --access public
+```
+
+Review the package name, version, and packed contents before publishing. After publication, verify the npm command in a clean environment and remove the pending-release notice. There are no install lifecycle side effects; installation runs only when the executable is invoked.
