@@ -77,3 +77,19 @@ Both checker/installer regressions were observed RED; subprocess environments
 now remove only that npm metadata key so version checks use the installed CLI.
 Final local suite: 16/16 passing on Node 20 and Node 25. The first CI matrix
 passed on Windows, macOS, and Linux; delivery tracks the final commit's checks.
+
+## CodeQL follow-up
+
+The user requested fixing the CodeQL alert and explicitly retaining Windows
+support. The suggested direct `execFileSync(ojo.cmd, ...)` replacement cannot
+launch Windows batch shims (Node child_process documentation). The checker and
+installer now resolve the known global/local OJO npm shim to the declared JS
+bin and execute Node with an argv array. This removes shell construction and
+keeps standard Windows npm installations working without runtime dependencies
+in the Git-distributed plugin. Custom batch wrappers must use a JS/native entry.
+
+New regression tests cover literal shell metacharacters in arguments and paths,
+global/local npm layouts, no batch execution, package identity/path validation,
+and corrupt-vs-missing CLI errors. Windows CI also exercises an actual packed
+installer with the official Codex npm release, auto-installs OJO 1.0.9, checks
+the real CLI and performs a repeat installation in isolated directories.

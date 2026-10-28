@@ -24,3 +24,31 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm pack --dry-run
+
+  windows-install:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Install the packed CLI twice with real Windows npm shims
+        shell: pwsh
+        run: |
+          $tools = Join-Path $env:RUNNER_TEMP "ojo-windows-tools"
+          npm install --global --prefix $tools @openai/codex@0.163.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:PATH = "$tools;$env:PATH"
+          $env:npm_config_prefix = $tools
+          $env:CODEX_HOME = Join-Path $env:RUNNER_TEMP "ojo-windows-codex"
+          $packed = npm pack --pack-destination $env:RUNNER_TEMP --json | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $tarball = Join-Path $env:RUNNER_TEMP $packed[0].filename
+          npx --yes "--package=$tarball" ojo-plugin install
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node codex-plugin/scripts/check-ojo-cli.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npx --yes "--package=$tarball" ojo-plugin install
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

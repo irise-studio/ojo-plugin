@@ -3,6 +3,7 @@
 import { readFileSync } from "node:fs";
 import spawn from "cross-spawn";
 import { install } from "../lib/install.mjs";
+import { resolveWindowsOjoCli } from "../codex-plugin/scripts/run-cli.mjs";
 
 const args = process.argv.slice(2);
 const { version } = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
@@ -30,9 +31,17 @@ Start a new Codex task after installation. Login is separate: ojo auth login.`);
   try {
     install({
       dryRun: args.includes("--dry-run"),
-      run: (command, parameters, { env, inherit, timeout }) => spawn.sync(command, parameters, {
-        env, timeout, encoding: "utf8", stdio: inherit ? "inherit" : ["ignore", "pipe", "pipe"],
-      }),
+      run: (command, parameters, { env, inherit, timeout }) => {
+        try {
+          const target = process.platform === "win32" && command === (process.env.OJO_CLI_BIN?.trim() || "ojo")
+            ? resolveWindowsOjoCli(command, env) : { file: command, prefix: [] };
+          return spawn.sync(target.file, [...target.prefix, ...parameters], {
+            env, timeout, encoding: "utf8", stdio: inherit ? "inherit" : ["ignore", "pipe", "pipe"],
+          });
+        } catch (error) {
+          return { status: null, error };
+        }
+      },
     });
   } catch (error) {
     console.error(`Installation failed: ${error.message}`);

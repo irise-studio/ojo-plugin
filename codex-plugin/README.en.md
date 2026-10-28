@@ -76,6 +76,7 @@ Append `--dry-run` to check prerequisites and preview commands without running n
 - If `ojo` is missing after npm installation, inspect `npm prefix -g` and add `<prefix>/bin` on macOS/Linux or `<prefix>` on Windows to `PATH`, then retry.
 - If an existing `irise-studio` marketplace points elsewhere, installation stops before changes. Inspect `codex plugin marketplace list`. Only remove the old source manually after confirming it and its plugins are no longer needed; the installer never replaces it automatically.
 - Windows command shims are supported by the process runner; real end-to-end acceptance is currently on macOS.
+- On Windows, the OJO npm `.cmd` shim only locates the JavaScript bin declared by `@touchine/ojo`. The checker and installer run that bin directly with Node, without interpreting batch text. Custom `OJO_CLI_BIN` values may select a JavaScript file or native executable; arbitrary `.cmd`/`.bat` wrappers are unsupported.
 
 ### Manual installation
 

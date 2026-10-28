@@ -44,9 +44,16 @@ CLIs, old Codex, marketplace conflicts, reruns, and installed-state verification
 Run the packed CLI and a real install twice with an isolated npm prefix and
 CODEX_HOME. Windows process launching is covered by cross-spawn; a real Windows
 acceptance run remains a stated limitation unless a Windows runner is available.
-The standalone checker uses a dependency-free Windows command shim runner;
-the CI matrix exercises its actual executable in a path containing spaces and
-an ampersand on Windows, macOS and Linux (Node 20).
+The standalone checker uses a dependency-free Windows npm shim resolver. It
+finds the adjacent `@touchine/ojo` package and runs its declared JS bin through
+Node with an argument array. It never runs `cmd.exe`, reads batch instructions,
+or builds shell command text. Native executables and explicitly selected JS
+entries are supported; arbitrary custom batch wrappers are rejected. Resolved
+package bins must stay inside the package, including after symlink resolution.
+The installer shares this resolver so a failed package is never certified as
+ready. Missing executable errors remain distinct from corrupt package errors.
+The CI matrix covers Node 20 on Windows/macOS/Linux, and a Windows integration
+job installs the packed installer twice with real Codex and OJO npm releases.
 
 Team OS / Context Bot entrypoints returned 404 during this task. This document
 records the agreed local design; it does not claim a Team OS decision or passed
