@@ -1,6 +1,6 @@
 {
   "name": "ojo",
-  "version": "0.1.3+codex.20261028",
+  "version": "0.1.4+codex.20261029",
   "description": "Connect local websites and apps to OJO for design optimization. Check project compatibility, prepare and validate prototypes, sync project files, and request design improvement proposals.",
   "author": {
     "name": "Irise Studio",
@@ -38,7 +38,10 @@
     "logo": "./assets/ojo-black.png",
     "logoDark": "./assets/ojo-white.png",
     "composerIcon": "./assets/ojo-black.png",
-    "composerIconDark": "./assets/ojo-white.png"
+    "composerIconDark": "./assets/ojo-white.png",
+    "supportURL": "https://ojo.art/help-center/",
+    "privacyPolicyURL": "https://ojo.art/privacy-policy/",
+    "termsOfServiceURL": "https://ojo.art/terms/"
   },
   "requires_local_executor": true
 }
