@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { delimiter } from "node:path";
+import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { install } from "../lib/install.mjs";
@@ -32,6 +33,7 @@ function environment(options = {}) {
     if (command !== "codex" && command !== "npm") {
       if (state.cli === null) return { status: null, error: Object.assign(new Error("missing"), { code: "ENOENT" }) };
       if (args[0] === "--version") return ok(settings.env.npm_package_version || state.cli);
+      if (args[0] === "capabilities") return ok(state.capabilities ?? { schemaVersion: 2, generation: "next", serviceApi: "server.v1" });
       return ok(state.brokenCli ? "missing subcommand" : help[args.slice(0, -1).join(" ")]);
     }
     if (args.includes("--help")) return state.oldCodex ? fail("unknown command") : ok("help");
@@ -43,7 +45,7 @@ function environment(options = {}) {
     }
     state.mutations.push([command, ...args]);
     if (state.failAt === args[1]) return fail("network or permission failure");
-    if (command === "npm") state.cli = state.installNotOnPath ? null : "1.0.9";
+    if (command === "npm") state.cli = state.installNotOnPath ? null : "2.0.0-next.10";
     else if (args[1] === "marketplace") state.marketplace = ownMarketplace();
     else if (args[1] === "add" && !state.missingReadback) state.installed = true;
     return ok({});
@@ -63,7 +65,7 @@ test("missing CLI is persisted before installing and verifying the plugin", () =
   execute();
   assert.equal(state.installed, true);
   assert.deepEqual(state.mutations, [
-    ["npm", "install", "--global", "@touchine/ojo@1.0.9"],
+    ["npm", "install", "--global", "@touchine-ai/ojo@latest"],
     ["codex", "plugin", "marketplace", "add", "irise-studio/ojo-plugin", "--ref", "main", "--json"],
     ["codex", "plugin", "add", "ojo@irise-studio", "--json"],
   ]);
@@ -81,8 +83,24 @@ test("a compatible CLI is preserved and a second install refreshes the marketpla
   ]);
 });
 
+test("the installer preserves a compatible next CLI without requiring legacy import commands", () => {
+  const { state, execute } = environment({ cli: "2.0.0-next.10" });
+  execute();
+  assert.equal(state.installed, true);
+  assert.equal(state.mutations.some(([command]) => command === "npm"), false);
+  assert.equal(state.calls.some(({ command, args }) => command === "ojo" && args[0] === "project"), false);
+});
+
+test("legacy import mode refuses a next CLI before looking up upload commands", () => {
+  const result = checkOjoCli((args) => {
+    assert.deepEqual(args, ["--version"]);
+    return "2.0.0-next.10";
+  }, { legacyImport: true });
+  assert.equal(result.ok, false);
+});
+
 test("old Codex, old Node and invalid CLI versions stop before mutations", () => {
-  for (const options of [{ oldCodex: true }, { cli: "2.0.0" }, { cli: "1.0.8" }, { cli: "1.0.9-beta.1" }, { brokenCli: true }]) {
+  for (const options of [{ oldCodex: true }, { cli: "2.0.0", capabilities: { generation: "legacy" } }, { cli: "3.0.0" }, { cli: "1.0.8" }, { cli: "1.0.9-beta.1" }, { brokenCli: true }]) {
     const { state, execute } = environment(options);
     assert.throws(() => execute());
     assert.equal(state.mutations.length, 0);
@@ -112,7 +130,7 @@ test("dry-run describes all missing components without mutations or success clai
   const { state, execute } = environment({ cli: null });
   execute({ dryRun: true });
   assert.equal(state.mutations.length, 0);
-  assert.match(state.output.join("\n"), /npm install --global @touchine\/ojo@1.0.9/);
+  assert.match(state.output.join("\n"), /npm install --global @touchine-ai\/ojo@latest/);
   assert.match(state.output.join("\n"), /codex plugin add ojo@irise-studio/);
   assert.doesNotMatch(state.output.join("\n"), /Installation verified/);
 });
@@ -174,15 +192,17 @@ test("contract checks reject a missing command and accept a later stable 1.x rel
 
 test("the actual entrypoint exposes help/version and rejects unknown arguments", () => {
   const entrypoint = new URL("../bin/ojo-plugin.mjs", import.meta.url);
+  const { version } = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
   for (const [args, status, output] of [
     [["--help"], 0, /Usage: ojo-plugin/],
-    [["--version"], 0, /^0\.1\.0\s*$/],
+    [["--version"], 0, (output) => assert.equal(output.trim(), version)],
     [["uninstall"], 1, /Unknown arguments/],
     [["install", "--force"], 1, /Unknown arguments/],
   ]) {
     const result = spawnSync(process.execPath, [fileURLToPath(entrypoint), ...args], { encoding: "utf8" });
     assert.equal(result.status, status);
-    assert.match(result.stdout + result.stderr, output);
+    if (typeof output === "function") output(result.stdout + result.stderr);
+    else assert.match(result.stdout + result.stderr, output);
     assert.doesNotMatch(result.stdout, /Checking Codex/);
   }
 });

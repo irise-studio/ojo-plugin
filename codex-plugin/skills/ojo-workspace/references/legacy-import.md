@@ -7,11 +7,14 @@ Apply the [publication policy](../../convert-to-ojo/references/publication-polic
 the user's request or standing authorization permits checked projects to be
 uploaded to `ojo.art` without an additional production-only confirmation.
 
-Run `node <plugin>/scripts/check-ojo-cli.mjs`. This checks the installed `ojo`
-(or explicit `OJO_CLI_BIN`) and verifies the command signatures used by the
-plugin. Version 1.0.8 lacks `project import`; install the known supported release
-with `npm install -g @touchine/ojo@1.0.9`. The check verifies command shape; an
-authenticated hosted import is still needed for end-to-end evidence.
+Run `node <plugin>/scripts/check-ojo-cli.mjs --legacy-import` before import or Team work. Use the exact returned `command` for every step, including login. If a next CLI is already the global default, install 1.x in a separate directory and set `OJO_LEGACY_CLI_BIN` to its JavaScript entry:
+
+```sh
+npm install --prefix "$HOME/.local/ojo-legacy" @touchine/ojo@1.0.9
+export OJO_LEGACY_CLI_BIN="$HOME/.local/ojo-legacy/node_modules/@touchine/ojo/dist/index.js"
+```
+
+The checker verifies command shape. An authenticated hosted import is still needed for end-to-end evidence.
 
 For new plugin-created projects, first use `ojo project team list --json` in the
 same environment and resolve the requested/default Team to its unique catalog ID.

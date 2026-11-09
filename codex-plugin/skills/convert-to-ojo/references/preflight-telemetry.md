@@ -4,7 +4,7 @@ This measures incoming conversion attempts, not unique projects, completed conve
 
 ## Respect configuration and discover the command
 
-`OJO_CONVERSION_TELEMETRY=off` (also `0` / `false`) or `DO_NOT_TRACK=1` disables reporting. If disabled, do not create an event file. Otherwise use the same verified `@touchine/ojo` executable selected for this workflow and check `ojo conversion report --help`. Do not install another CLI or switch accounts/environments just for telemetry. Missing command, login, endpoint or network means report skipped/failed and continue the authorized conversion decision.
+`OJO_CONVERSION_TELEMETRY=off` (also `0` / `false`) or `DO_NOT_TRACK=1` disables reporting. If disabled, do not create an event file. Otherwise use the same verified primary OJO executable selected for this workflow and check `ojo conversion report --help`. Do not install another CLI or switch accounts/environments just for telemetry. Missing command, login, endpoint or network means report skipped/failed and continue the authorized conversion decision.
 
 ## Build a minimal event
 

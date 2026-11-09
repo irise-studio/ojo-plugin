@@ -61,7 +61,7 @@ investigate frontend initialization separately; do not repeatedly overwrite it.
 
 ## CLI command
 
-`@touchine/ojo >=1.0.9 <2.0.0` implements a separate Team command. Verify the actual
+`@touchine/ojo >=1.0.9 <2.0.0` implements a separate Team command. Run the checker with `--legacy-import` and use its returned executable. Verify the actual
 installed executable's help includes `Usage: ojo project team set`, `<projectId>`,
 `--name`, `--team-id`, and `--json`; parent help or a zero exit code is insufficient.
 An older global 1.0.8 installation may still lack it; install `@touchine/ojo@1.0.9`.

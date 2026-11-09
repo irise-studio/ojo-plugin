@@ -7,7 +7,7 @@ description: Build or modify a local OJO prototype with its own manifest, source
 
 Follow [CLI and API only](../ojo-workspace/references/transport-policy.md) for all operations. Browser automation is prohibited. Report unsupported client operations explicitly.
 
-Use the workspace's checked-in package manager and scripts as the executable build contract. The supported `@touchine/ojo` CLI synchronizes and imports workspaces, but does not provide `prototype validate`, `prototype build`, or `prototype publish` commands.
+Use the workspace's checked-in package manager and scripts as the executable build contract. Both CLI generations support workspace sync. The plugin uses the export’s own build checks and verifies a separate 1.x CLI before ZIP import.
 
 Read [generate_prototype gate contract](references/generate-prototype-build-gate.md) as a file and artifact checklist before editing. Do not present that reference as a CLI capability.
 
@@ -54,11 +54,11 @@ Preserve the export's source layout and build implementation. Keep meaningful bu
    - a page-bundle command did not silently skip all pages.
 5. Rerun the applicable checks after any source, metadata, or snapshot change.
 
-Record the exact commands and results. Do not claim a non-existent `ojo prototype` validation or publication gate.
+Record the exact commands and results. Report only the validation gates actually run.
 
 ## Authorized upload
 
-If the user explicitly asks to upload the completed workspace, hand off to `ojo-workspace`. The supported publication command is:
+If the user explicitly asks to upload the completed workspace, hand off to `ojo-workspace`. Use the executable verified by its `--legacy-import` check. The supported publication command is:
 
 ```bash
 ojo project import <workspacePath> --project-id <emptyProjectId> --json

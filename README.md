@@ -31,7 +31,7 @@ npx -y github:irise-studio/ojo-plugin#main install
 - 插件所需的 skills、说明文档和本地辅助脚本。
 
 本仓库不包含 OJO CLI 的实现，也不要求普通插件用户读取单独的 `irise-studio/irise-web` 仓库。
-当前插件面向 `@touchine/ojo >=1.0.9 <2.0.0`；已验证版本可通过 `npm install -g @touchine/ojo@1.0.9` 安装。
+常规操作支持 `@touchine-ai/ojo@latest`（已验证 `2.0.0-next.10`）和兼容的 `@touchine/ojo` 1.x（最低 `1.0.9`）。旧版 ZIP 导入和 Team 设置仍使用 1.x，可通过 `OJO_LEGACY_CLI_BIN` 单独指定。
 
 ## 已支持的插件
 

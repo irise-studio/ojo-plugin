@@ -1,30 +1,33 @@
-# `@touchine/ojo` CLI contract
+# OJO CLI contract
 
-The plugin targets the public npm package `@touchine/ojo` and currently supports CLI versions `>=1.0.9 <2.0.0`.
-
-Install the known supported release:
+Use `node <plugin>/scripts/check-ojo-cli.mjs` to select a compatible CLI. The primary executable comes from `OJO_CLI_BIN` or `PATH`. Next CLI 2.x must report capability schema 2, generation `next`, and service API `server.v1`. Stable 1.x must be at least 1.0.9. Both must pass the shared command checks.
 
 ```bash
-npm install -g @touchine/ojo@1.0.9
+npm install -g @touchine-ai/ojo@latest
 ```
 
-Then run the plugin's `scripts/check-ojo-cli.mjs`. Set `OJO_CLI_BIN` when the executable is not named `ojo` or is not on `PATH`.
+ZIP import and Team operations use a separate check, `node <plugin>/scripts/check-ojo-cli.mjs --legacy-import`. If the primary CLI is next, point `OJO_LEGACY_CLI_BIN` to the JavaScript entry of a compatible 1.x installation. See [legacy import](legacy-import.md) for side-by-side setup. Use the exact executable returned as `command`.
 
-## Enabled commands
+## Shared commands
 
 ```bash
 ojo --version
 ojo auth login --mode web --no-open --json
 ojo workspace sync [projectRef] --path <dir> --json
+ojo conversion report <eventFile> --json
+ojo chat --message <message> --project-id <projectId> --json
+ojo query --project-id <projectId> --json
+ojo screen --project-id <projectId> --json
+```
+
+## Legacy import and Team commands
+
+```bash
 ojo project import <workspacePath> --name <name> --team-id <id> --json
 ojo project import <workspacePath> --project-id <id> --json
 ojo project team list --json
 ojo project team get <projectId> --json
 ojo project team set <projectId> --team-id <id> --json
-ojo conversion report <eventFile> --json
-ojo chat --message <message> --project-id <projectId> --json
-ojo query --project-id <projectId> --json
-ojo screen --project-id <projectId> --json
 ```
 
 Verify help before dispatch because an unknown nested command can print parent help and exit successfully.
@@ -39,7 +42,7 @@ Verify help before dispatch because an unknown nested command can print parent h
 - `conversion report` sends only the bounded preflight telemetry event.
 - `screen` retrieves the supported project preview artifact; it is not browser verification.
 
-The CLI does not provide the plugin with `capabilities`, `prototype validate`, `prototype build`, `prototype publish`, `workspace dev`, or `workspace publish-resources`. Do not call these commands or claim their protocols passed.
+The next CLI exposes additional prototype commands, but the plugin keeps the export-native build checks and the separate legacy ZIP import flow. A next CLI capability check does not validate publication, canvas, or remote access.
 
 ## Authentication
 

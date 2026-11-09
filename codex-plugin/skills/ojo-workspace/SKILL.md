@@ -1,6 +1,6 @@
 ---
 name: ojo-workspace
-description: Use @touchine/ojo CLI authentication and verified APIs to synchronize an OJO workspace, import an explicitly authorized validated prototype, manage its Team, or run user-requested remote OJO chat and status queries. Local Irise Web canvas startup and localhost preview are disabled. Route non-OJO local website optimization through convert-to-ojo first.
+description: Use OJO CLI authentication and verified APIs to synchronize an OJO workspace, import an explicitly authorized validated prototype, manage its Team, or run user-requested remote OJO chat and status queries. Local Irise Web canvas startup and localhost preview are disabled. Route non-OJO local website optimization through convert-to-ojo first.
 ---
 
 # OJO Workspace
@@ -9,15 +9,15 @@ Follow [CLI and API only](references/transport-policy.md) for all operations. Br
 
 ## Supported CLI
 
-Run the bundled `../../scripts/check-ojo-cli.mjs` relative to this file. It verifies `@touchine/ojo` CLI `>=1.0.9 <2.0.0` and the exact command signatures used by this plugin. Use the same `ojo` executable, or set `OJO_CLI_BIN`.
+Run the bundled `../../scripts/check-ojo-cli.mjs` and use the exact executable in its `command` field. It checks a compatible `@touchine-ai/ojo` 2.x or stable `@touchine/ojo` 1.x (at least 1.0.9). Select the primary CLI with `OJO_CLI_BIN` when needed.
 
-If it is missing, install the known supported release:
+For a missing primary CLI:
 
 ```bash
-npm install -g @touchine/ojo@1.0.9
+npm install -g @touchine-ai/ojo@latest
 ```
 
-The supported CLI does not expose `capabilities`, `prototype validate`, `prototype build`, `prototype publish`, `workspace dev`, or `workspace publish-resources`. Never infer support from an unknown command returning parent help.
+An `ok: true` result with `generation: next` supports the shared commands below. For ZIP import or Team operations, run the checker with `--legacy-import` and use its returned executable for every related command, including login. This explicit check prefers `OJO_LEGACY_CLI_BIN` when set. Never run legacy import or Team commands on the next CLI.
 
 See [CLI contract](references/cli-contract.md) for the enabled command surface.
 
@@ -42,7 +42,7 @@ If an operation returns `AUTH_REQUIRED`, follow the no-auto-open login flow in [
 
 ## Import or update a project
 
-Follow [project import](references/legacy-import.md) for an explicitly authorized upload. Use `ojo project team list/get/set` and [Team setting](references/upload-team.md) where required.
+Follow [project import](references/legacy-import.md) for an explicitly authorized upload. Require a successful `--legacy-import` check before any target or Team write. Use `ojo project team list/get/set` and [Team setting](references/upload-team.md) where required.
 
 `project import` accepts a built workspace and either:
 
