@@ -1,6 +1,6 @@
 {
   "name": "@touchine/ojo-plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Install and verify the OJO Codex plugin and its OJO CLI dependency",
   "type": "module",
   "bin": { "ojo-plugin": "bin/ojo-plugin.mjs" },

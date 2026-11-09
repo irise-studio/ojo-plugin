@@ -45,7 +45,7 @@ Record scaffold provenance/version. Retain its runtime/build implementation and 
 
 If targeted inspection cannot locate a usable scaffold/runtime contract, complete the inventory and mapping, identify the exact missing dependency, and report conversion as incomplete. Do not fabricate compatibility to satisfy structural checks.
 
-For an authorized upload, follow [project import](../ojo-workspace/references/legacy-import.md): run the plugin's `../../scripts/check-ojo-cli.mjs`, retain the export's native build and validation, and inspect every page and snapshot. The checker targets `@touchine/ojo >=1.0.9 <2.0.0`. Source analysis and local conversion can continue while CLI setup is unresolved.
+For an authorized upload, follow [project import](../ojo-workspace/references/legacy-import.md): run `node ../../scripts/check-ojo-cli.mjs --legacy-import` relative to this skill, use its returned executable, retain the export's native build and validation, and inspect every page and snapshot. The checker targets `@touchine/ojo >=1.0.9 <2.0.0`. Source analysis and local conversion can continue while CLI setup is unresolved.
 
 ## Convert
 

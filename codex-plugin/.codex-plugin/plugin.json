@@ -1,6 +1,6 @@
 {
   "name": "ojo",
-  "version": "0.1.3+codex.20261028",
+  "version": "0.1.4",
   "description": "Connect local websites and apps to OJO for design optimization. Check project compatibility, prepare and validate prototypes, sync project files, and request design improvement proposals.",
   "author": {
     "name": "Irise Studio",

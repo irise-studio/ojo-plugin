@@ -36,6 +36,21 @@ test("Windows global and local npm shims execute their declared JS entry without
   }
 });
 
+test("Windows resolves the next CLI when both npm packages are installed", () => {
+  const f = fixture();
+  try {
+    const next = join(f.root, "node_modules", "@touchine-ai", "ojo");
+    mkdirSync(next, { recursive: true });
+    writeFileSync(join(next, "package.json"), JSON.stringify({ name: "@touchine-ai/ojo", bin: { ojo: "index.js" } }));
+    writeFileSync(join(next, "index.js"), "console.log('next');");
+    writeFileSync(f.shim, '@echo off\r\n"%dp0%\\node_modules\\@touchine-ai\\ojo\\index.js" %*\r\n');
+    const target = cliRunner.resolveWindowsOjoCli(f.shim, {});
+    assert.equal(execFileSync(target.file, target.prefix, { encoding: "utf8" }).trim(), "next");
+  } finally {
+    rmSync(f.root, { recursive: true, force: true });
+  }
+});
+
 test("Windows shim resolution rejects arbitrary batch wrappers and package bin escapes", () => {
   const f = fixture();
   try {

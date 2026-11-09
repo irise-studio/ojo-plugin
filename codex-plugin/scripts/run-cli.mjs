@@ -31,25 +31,34 @@ function findWindowsExecutable(command, env) {
 }
 
 // Never interpret batch text. A standard npm shim identifies the adjacent
-// @touchine/ojo package; run its declared JS bin with Node and an argv array.
+// @touchine/ojo or @touchine-ai/ojo package; run its declared JS bin with Node and an argv array.
 export function resolveWindowsOjoCli(command, env = process.env) {
   const executable = findWindowsExecutable(command, env);
   if (/\.(?:exe|com)$/i.test(executable)) return { file: executable, prefix: [] };
   if (/\.(?:js|cjs|mjs)$/i.test(executable)) return { file: process.execPath, prefix: [executable] };
-  const unsupported = () => new Error("Unsupported Windows batch wrapper. Use the installed @touchine/ojo npm shim, its JavaScript entry, or a native executable in OJO_CLI_BIN.");
+  const unsupported = () => new Error("Unsupported Windows batch wrapper. Use an installed OJO npm shim, its JavaScript entry, or a native executable in OJO_CLI_BIN.");
   if (basename(executable).toLowerCase() !== "ojo.cmd") throw unsupported();
 
   const directory = dirname(executable);
-  const manifests = [join(directory, "node_modules", "@touchine", "ojo", "package.json")];
-  if (basename(directory).toLowerCase() === ".bin" && basename(dirname(directory)).toLowerCase() === "node_modules") {
-    manifests.push(resolve(directory, "..", "@touchine", "ojo", "package.json"));
+  const packageDirectory = basename(directory).toLowerCase() === ".bin" && basename(dirname(directory)).toLowerCase() === "node_modules"
+    ? dirname(directory) : join(directory, "node_modules");
+  const candidates = ["@touchine", "@touchine-ai"].map((scope) => ({
+    name: `${scope}/ojo`,
+    manifest: join(packageDirectory, scope, "ojo", "package.json"),
+  }));
+  // When both packages are installed, select the one named by the npm shim.
+  // Read only the package path; never execute or expand the batch contents.
+  const shim = readFileSync(executable, "utf8").replaceAll("\\", "/");
+  const referenced = candidates.filter(({ name }) => shim.includes(`/${name}/`));
+  const installed = (referenced.length ? referenced : candidates).filter(({ manifest }) => isFile(manifest));
+  if (referenced.length > 1 || installed.length > 1) {
+    throw new Error("Ambiguous OJO npm shim. Set OJO_CLI_BIN to the intended JavaScript entry.");
   }
-  for (const manifest of manifests) {
-    if (!isFile(manifest)) continue;
+  for (const { name, manifest } of installed) {
     try {
       const pkg = JSON.parse(readFileSync(manifest, "utf8"));
       const bin = typeof pkg.bin === "string" ? pkg.bin : pkg.bin?.ojo;
-      if (pkg.name !== "@touchine/ojo" || typeof bin !== "string" || !/\.(?:js|cjs|mjs)$/i.test(bin)) throw unsupported();
+      if (pkg.name !== name || typeof bin !== "string" || !/\.(?:js|cjs|mjs)$/i.test(bin)) throw unsupported();
       const root = realpathSync(dirname(manifest));
       const withinPackage = (entry) => {
         const path = relative(root, entry);

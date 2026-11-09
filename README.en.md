@@ -31,7 +31,7 @@ This repository is the Irise Studio distribution repository for the OJO plugin f
 - the skills, documentation, and local helper scripts required by those plugins.
 
 This repository does not contain the OJO CLI implementation, and ordinary plugin users do not need read access to the separate `irise-studio/irise-web` repository.
-The current plugin targets `@touchine/ojo >=1.0.9 <2.0.0`; install the verified release with `npm install -g @touchine/ojo@1.0.9`.
+Shared workflows support `@touchine-ai/ojo@latest` (verified with `2.0.0-next.10`) and compatible `@touchine/ojo` 1.x releases starting at `1.0.9`. Legacy ZIP import and Team operations still use 1.x, which can be selected with `OJO_LEGACY_CLI_BIN`.
 
 ## Supported plugins
 

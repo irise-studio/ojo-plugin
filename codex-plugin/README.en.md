@@ -32,13 +32,13 @@ The plugin is displayed as **OJO**.
 - Read access to the `irise-studio/ojo-plugin` repository;
 - Node.js 20 or newer;
 - automatic installation also requires npm, Git, npm/GitHub network access, and an official Codex CLI supporting `codex plugin add` (verified with `0.163.0`);
-- `@touchine/ojo` CLI `>=1.0.9 <2.0.0`, available as `ojo` on `PATH` or selected with `OJO_CLI_BIN`;
+- The next CLI `@touchine-ai/ojo` or a compatible `@touchine/ojo` 1.x release starting at `1.0.9`, available as `ojo` on `PATH` or selected with `OJO_CLI_BIN`;
 - a valid OJO login and the relevant project permissions for synchronization, publication, remote chat, and query operations.
 
 Install the currently verified CLI release:
 
 ```bash
-npm install -g @touchine/ojo@1.0.9
+npm install -g @touchine-ai/ojo@latest
 ```
 
 Then verify its version and command signatures with the bundled checker:
@@ -47,7 +47,7 @@ Then verify its version and command signatures with the bundled checker:
 node codex-plugin/scripts/check-ojo-cli.mjs
 ```
 
-This repository distributes the Codex plugin, not the OJO CLI. The CLI provides workspace sync, project import, Team, chat/query, screen, and conversion-report operations. Local prototype validation and builds use the export's own scripts, not nonexistent `ojo prototype` subcommands.
+This repository distributes the Codex plugin, not the OJO CLI. Both CLI generations provide workspace sync, chat/query, screen, and conversion reporting. Legacy ZIP import and Team operations require 1.x. When the next CLI is the default, set `OJO_LEGACY_CLI_BIN` to select a separate legacy executable for imports. Local prototype validation and builds use the export's own scripts.
 
 ## Installation
 
@@ -65,7 +65,7 @@ Alternatively, install directly from GitHub:
 npx -y github:irise-studio/ojo-plugin#main install
 ```
 
-The installer checks Node/Codex and preserves a CLI that passes the version and command checks. Only a missing CLI triggers `npm install --global @touchine/ojo@1.0.9`. It then registers or refreshes this repository's marketplace, runs `codex plugin add ojo@irise-studio`, and reads back installed/enabled state. Rerunning refreshes the same source and verifies again.
+The installer checks Node/Codex and preserves a CLI that passes the version and command checks. Only a missing CLI triggers `npm install --global @touchine-ai/ojo@latest`. It then registers or refreshes this repository's marketplace, runs `codex plugin add ojo@irise-studio`, and reads back installed/enabled state. Rerunning refreshes the same source and verifies again.
 
 Append `--dry-run` to check prerequisites and preview commands without running npm installs or marketplace writes. Login is separate. Start a new Codex task after installation; run `ojo auth login` when remote project access needs authentication.
 
@@ -76,7 +76,7 @@ Append `--dry-run` to check prerequisites and preview commands without running n
 - If `ojo` is missing after npm installation, inspect `npm prefix -g` and add `<prefix>/bin` on macOS/Linux or `<prefix>` on Windows to `PATH`, then retry.
 - If an existing `irise-studio` marketplace points elsewhere, installation stops before changes. Inspect `codex plugin marketplace list`. Only remove the old source manually after confirming it and its plugins are no longer needed; the installer never replaces it automatically.
 - Windows, macOS, and Linux use the same installation entrypoint. Windows CI verifies first/repeat installation and the standalone checker with real Codex/OJO npm releases; isolated installation acceptance has also passed on macOS.
-- On Windows, the OJO npm `.cmd` shim only locates the JavaScript bin declared by `@touchine/ojo`. The checker and installer run that bin directly with Node, without interpreting batch text. Custom `OJO_CLI_BIN` values may select a JavaScript file or native executable; arbitrary `.cmd`/`.bat` wrappers are unsupported.
+- On Windows, the OJO npm `.cmd` shim only locates the JavaScript bin declared by the installed OJO npm package. The checker and installer run that bin directly with Node, without interpreting batch text. Custom `OJO_CLI_BIN` values may select a JavaScript file or native executable; arbitrary `.cmd`/`.bat` wrappers are unsupported.
 
 ### Manual installation
 
