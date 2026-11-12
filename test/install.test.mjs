@@ -10,10 +10,10 @@ import { checkOjoCli } from "../codex-plugin/scripts/cli-contract.mjs";
 // External processes are the boundary: npm/Codex would otherwise write real user state.
 const help = {
   "workspace sync": "Usage: ojo workspace sync --path <dir> --json",
-  "project import": "Usage: ojo project import <workspacePath> --name <name> --team-id <id> --project-id <id> --json",
-  "project team list": "Usage: ojo project team list --json",
-  "project team get": "Usage: ojo project team get <projectId> --json",
-  "project team set": "Usage: ojo project team set <projectId> --team-id <id> --name <name> --json",
+  "project create": "Usage: ojo project create --name <name> --json",
+  "prototype validate": "Usage: ojo prototype validate --json",
+  "prototype build": "Usage: ojo prototype build --json",
+  "prototype publish": "Usage: ojo prototype publish --project-id <projectId> --json",
   "auth login": "Usage: ojo auth login --mode <mode> --no-open --json",
   chat: "Usage: ojo chat --message <msg> --project-id <projectId> --json",
   query: "Usage: ojo query --project-id <projectId> --json",
@@ -23,7 +23,7 @@ const help = {
 
 function environment(options = {}) {
   const state = {
-    cli: "1.0.9", marketplace: null, installed: false, enabled: true,
+    cli: "2.0.0-next.13", marketplace: null, installed: false, enabled: true,
     mutations: [], calls: [], output: [], ...options,
   };
   const ok = (value = "") => ({ status: 0, stdout: typeof value === "string" ? value : JSON.stringify(value), stderr: "" });
@@ -183,9 +183,13 @@ test("an invoking project's npm version cannot override the installed OJO CLI ve
   assert.equal(state.mutations.some(([command]) => command === "npm"), false);
 });
 
-test("contract checks reject a missing command and accept a later stable 1.x release", () => {
-  assert.equal(checkOjoCli((args) => args[0] === "--version" ? "1.1.0" : help[args.slice(0, -1).join(" ")]).ok, true);
-  const result = checkOjoCli((args) => args[0] === "--version" ? "1.0.9" : "unknown subcommand");
+test("contract rejects all legacy releases and missing next commands", () => {
+  for (const version of ["1.0.9", "1.1.0"]) {
+    assert.equal(checkOjoCli(() => version).ok, false);
+  }
+  const result = checkOjoCli((args) => args[0] === "--version" ? "2.0.0-next.13"
+    : args[0] === "capabilities" ? JSON.stringify({schemaVersion:2,generation:"next",serviceApi:"server.v1"})
+    : "unknown subcommand");
   assert.equal(result.ok, false);
   assert.equal(result.checks.workspaceSync, false);
 });

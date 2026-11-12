@@ -7,47 +7,45 @@ const sharedCommands = {
   screen: [["screen"], [/--project-id <projectId>/, /--json/]],
 };
 
-const legacyCommands = {
-  projectImport: [["project", "import"], [/<workspacePath>/, /--name <name>/, /--team-id <id>/, /--project-id <id>/, /--json/]],
-  projectTeamList: [["project", "team", "list"], [/Usage: ojo project team list/, /--json/]],
-  projectTeamGet: [["project", "team", "get"], [/Usage: ojo project team get/, /<projectId>/, /--json/]],
-  projectTeamSet: [["project", "team", "set"], [/Usage: ojo project team set/, /<projectId>/, /--team-id <id>/, /--name <name>/, /--json/]],
+const importCommands = {
+  projectCreate: [["project", "create"], [/Usage: ojo project create/, /--name <name>/, /--json/]],
+  prototypeValidate: [["prototype", "validate"], [/Usage: ojo prototype validate/, /--json/]],
+  prototypeBuild: [["prototype", "build"], [/Usage: ojo prototype build/, /--json/]],
+  prototypePublish: [["prototype", "publish"], [/Usage: ojo prototype publish/, /--project-id <projectId>/, /--json/]],
 };
 
 export const NEXT_CLI_PACKAGE = "@touchine-ai/ojo@latest";
-export const LEGACY_CLI_PACKAGE = "@touchine/ojo@1.0.9";
 
 // run receives an argument array and returns stdout, or throws a process error.
-export function checkOjoCli(run, { legacyImport = false } = {}) {
+export function checkOjoCli(run, { importProject = false, legacyImport = false } = {}) {
   try {
     const version = run(["--version"]).trim();
-    const legacy = /^1\.(?:[1-9]\d*\.\d+|0\.(?:9|[1-9]\d+))(?:\+[\w.-]+)?$/.test(version);
     const next = /^2\.\d+\.\d+(?:-[\w.-]+)?(?:\+[\w.-]+)?$/.test(version);
-    if ((!legacy && !next) || (legacyImport && !legacy)) {
-      return { ok: false, version, reason: "unsupported_ojo_cli_version" };
+    if (!next || legacyImport) {
+      return { ok: false, version, reason: legacyImport ? "legacy_import_removed" : "unsupported_ojo_cli_version" };
     }
-
-    const generation = legacy ? "legacy" : "next";
+    const generation = "next";
     const checks = {};
-    if (next) {
-      let capabilities;
-      try {
-        capabilities = JSON.parse(run(["capabilities", "--json"]));
-      } catch {
-        return { ok: false, version, generation, reason: "next_cli_capabilities_required" };
-      }
-      if (capabilities?.schemaVersion !== 2 || capabilities.generation !== "next" || capabilities.serviceApi !== "server.v1") {
-        return { ok: false, version, generation, reason: "next_cli_capabilities_required" };
-      }
+    let capabilities;
+    try {
+      capabilities = JSON.parse(run(["capabilities", "--json"]));
+    } catch {
+      return { ok: false, version, generation, reason: "next_cli_capabilities_required" };
+    }
+    if (capabilities?.schemaVersion !== 2 || capabilities.generation !== "next" || capabilities.serviceApi !== "server.v1") {
+      return { ok: false, version, generation, reason: "next_cli_capabilities_required" };
+    }
+    if (importProject && capabilities.localPrototypePublishProtocol !== 1) {
+      return { ok: false, version, generation, reason: "next_cli_publication_required" };
     }
 
-    const commands = legacy ? { ...sharedCommands, ...legacyCommands } : sharedCommands;
+    const commands = importProject ? { ...sharedCommands, ...importCommands } : sharedCommands;
     for (const [name, [args, patterns]] of Object.entries(commands)) {
       const output = run([...args, "--help"]);
       checks[name] = patterns.every((pattern) => pattern.test(output));
     }
     const ok = Object.values(checks).every(Boolean);
-    return { ok, version, generation, checks, legacyImport: legacy && ok, ...(ok ? {} : { reason: "unsupported_ojo_cli_commands" }) };
+    return { ok, version, generation, checks, legacyImport: false, importProject: importProject && ok, ...(ok ? {} : { reason: "unsupported_ojo_cli_commands" }) };
   } catch (error) {
     return { ok: false, reason: error?.code === "ENOENT" ? "not_found" : "cli_check_failed" };
   }

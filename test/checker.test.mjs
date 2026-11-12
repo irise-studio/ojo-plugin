@@ -14,8 +14,8 @@ test("the standalone checker executes a CLI shim in a path containing spaces and
     writeFileSync(join(pkg, "package.json"), JSON.stringify({ name: "@touchine/ojo", bin: { ojo: "fixture.mjs" } }));
     const cli = join(pkg, "fixture.mjs");
     // Command availability is tested by install.test.mjs; this test exercises process launching.
-    const output = "Usage: ojo workspace sync Usage: ojo project team list Usage: ojo project team get Usage: ojo project team set --path <dir> --json <workspacePath> --name <name> --team-id <id> --project-id <id> <projectId> --mode <mode> --no-open --message <msg> --project-id <projectId> <eventFile>";
-    writeFileSync(cli, `#!/usr/bin/env node\nconsole.log(process.argv[2] === '--version' ? (process.env.npm_package_version || '1.0.9') : ${JSON.stringify(output)});\n`);
+    const output = "Usage: ojo workspace sync --path <dir> --json <workspacePath> --name <name> --team-id <id> --project-id <id> <projectId> --mode <mode> --no-open --message <msg> --project-id <projectId> <eventFile>";
+    writeFileSync(cli, `#!/usr/bin/env node\nconsole.log(process.argv[2] === 'capabilities' ? JSON.stringify({schemaVersion:2,generation:'next',serviceApi:'server.v1'}) : process.argv[2] === '--version' ? (process.env.npm_package_version || '2.0.0-next.13') : ${JSON.stringify(output)});\n`);
     chmodSync(cli, 0o755);
     const executable = process.platform === "win32" ? join(folder, "ojo.cmd") : cli;
     if (process.platform === "win32") writeFileSync(executable, "@echo this batch must never execute\r\nexit /b 9\r\n");

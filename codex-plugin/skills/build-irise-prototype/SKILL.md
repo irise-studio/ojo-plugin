@@ -7,7 +7,7 @@ description: Build or modify a local OJO prototype with its own manifest, source
 
 Follow [CLI and API only](../ojo-workspace/references/transport-policy.md) for all operations. Browser automation is prohibited. Report unsupported client operations explicitly.
 
-Use the workspace's checked-in package manager and scripts as the executable build contract. Both CLI generations support workspace sync. The plugin uses the export’s own build checks and verifies a separate 1.x CLI before ZIP import.
+Use the workspace's checked-in package manager and scripts as the executable build contract. Use only the verified next CLI for workspace sync, build gates and publication.
 
 Read [generate_prototype gate contract](references/generate-prototype-build-gate.md) as a file and artifact checklist before editing. Do not present that reference as a CLI capability.
 
@@ -58,19 +58,13 @@ Record the exact commands and results. Report only the validation gates actually
 
 ## Authorized upload
 
-If the user explicitly asks to upload the completed workspace, hand off to `ojo-workspace`. Use the executable verified by its `--legacy-import` check. The supported publication command is:
+For an explicitly authorized upload, follow [new-framework publication](../ojo-workspace/references/project-import.md). Run `check-ojo-cli.mjs --import`, create an authorized new target with `ojo project create --name <name> --json` when required, record its identity, then publish:
 
-```bash
-ojo project import <workspacePath> --project-id <emptyProjectId> --json
+```sh
+ojo prototype publish <workspacePath> --project-id <recordedProjectId> --json
 ```
 
-or, for an authorized new project:
-
-```bash
-ojo project import <workspacePath> --name <name> --team-id <teamId> --json
-```
-
-The import command expects an already built workspace; it does not replace local validation.
+Retain native page/snapshot validation alongside the next CLI gates. Capture the publication result and read back the same new-framework target through workspace sync.
 
 ## Preview restriction
 

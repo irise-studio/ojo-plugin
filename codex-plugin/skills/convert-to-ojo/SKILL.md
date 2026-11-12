@@ -45,7 +45,7 @@ Record scaffold provenance/version. Retain its runtime/build implementation and 
 
 If targeted inspection cannot locate a usable scaffold/runtime contract, complete the inventory and mapping, identify the exact missing dependency, and report conversion as incomplete. Do not fabricate compatibility to satisfy structural checks.
 
-For an authorized upload, follow [project import](../ojo-workspace/references/legacy-import.md): run `node ../../scripts/check-ojo-cli.mjs --legacy-import` relative to this skill, use its returned executable, retain the export's native build and validation, and inspect every page and snapshot. The checker targets `@touchine/ojo >=1.0.9 <2.0.0`. Source analysis and local conversion can continue while CLI setup is unresolved.
+For an authorized upload, follow [project import](../ojo-workspace/references/project-import.md): run `node ../../scripts/check-ojo-cli.mjs --import` relative to this skill, use its returned executable, retain the export's native build and validation, and inspect every page and snapshot. The checker requires next-generation server.v1 creation and prototype publication capabilities. Source analysis and local conversion can continue while CLI setup is unresolved.
 
 ## Convert
 
@@ -79,13 +79,10 @@ Projects that pass this workflow may be uploaded to `https://ojo.art` under the
 [publication policy](references/publication-policy.md). An upload request or the
 user's standing authorization for checked projects is sufficient; do not ask
 again solely because the destination is production. Resolve the selected target
-or authorized new project, use the target-compatible CLI, and preserve its
-empty-project and version constraints. A same-ZIP retry cannot publish changed
+or authorized new project, use the verified next CLI, and preserve its
+target identity and version constraints. Rebuild and publish changed
 snapshots. Report the actual target and result separately from canvas verification.
 
-As part of the authorized upload, apply the [default upload team](../ojo-workspace/references/upload-team.md):
-select **原型设计团队** unless the user specifies another team, and verify that
-the setting persists. For new targets, save and verify Team before ZIP upload, then hand the project to OJO for optimization.
-
+For a requested Team, retain the requested/default 原型设计团队 intent and follow [Team status](../ojo-workspace/references/upload-team.md). The next CLI has no Team settings command, so report it as pending. Publish and verify the authorized target through server.v1 before handing it to OJO for optimization.
 
 Finish with the output link, page mapping, validation results, behavior changes, and blockers. Update the report with evidence. Distinguish export-format alignment, local build/package checks, optional standalone HTML evidence, unavailable project-bound OJO canvas validation, and remote publication. Claim OJO runtime compatibility only for a tested target and its observed behavior, never from local compilation alone.

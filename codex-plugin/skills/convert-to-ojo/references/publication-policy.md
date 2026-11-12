@@ -8,13 +8,7 @@ authorization for the selected project; do not upload unrelated local projects.
 Analysis-only, conversion-only, no-upload, and proposal-approval limits still
 apply. Installing or invoking the skill alone is not permission to upload files.
 
-The authorized upload includes its necessary production project writes: creating
-the selected target, importing validated artifacts, and setting/verifying the
-default or explicitly selected Team through agent-engine workspace context. Do not ask for a separate production-write
-confirmation for this Team step. Reuse an explicit user exception
-to repository production-write restrictions for this scope; it does not authorize
-unrelated production operations, Git pushes or deployment, and cannot bypass a
-tool or service denial.
+The authorized upload includes creating the selected new-framework target and publishing its validated artifacts with the next CLI. Requested Team intent is recorded as pending until the next CLI supports it. Reuse scoped upload authorization for these necessary writes. Service and tool denials remain authoritative.
 
 “Passes” means evidence from the actual workspace: compatibility preflight admits
 the project, required adaptations are complete, the selected export/runtime is
@@ -32,8 +26,8 @@ version and retry constraints, and upload only the prepared workspace's required
 source/configuration/assets. An upload request does not authorize overwriting an
 unrelated project or sending an optimization message.
 
-Use the verified `@touchine/ojo >=1.0.9 <2.0.0` CLI and follow
-[project import](../../ojo-workspace/references/legacy-import.md). Record the
+Use only the verified `@touchine-ai/ojo` 2.x CLI and follow
+[project import](../../ojo-workspace/references/project-import.md). Record the
 project ID before any retry and distinguish successful upload from hosted canvas
 verification. This policy describes user-authorized product upload, not general
 production administration; it does not bypass service permissions or tool
