@@ -47,7 +47,7 @@ npm install -g @touchine-ai/ojo@latest
 node codex-plugin/scripts/check-ojo-cli.mjs
 ```
 
-本仓库只分发 Codex 插件，不分发 OJO CLI。两代 CLI 都支持 workspace 同步、chat/query、screen 和 conversion report。旧版 ZIP 导入和 Team 设置要求 1.x。新版作为默认 CLI 时，设置 `OJO_LEGACY_CLI_BIN` 可单独选择导入用的旧版。本地 prototype 校验与构建使用 export 自带脚本。
+所有远端工作流仅使用新版 `@touchine-ai/ojo` 2.x。导入前执行 `check-ojo-cli.mjs --import`，确认同一 CLI 支持 server.v1 的 `project create` 和 `prototype publish`。缺少任一能力时停止上传。Team 配置暂不受新版 CLI 支持，报告待处理。
 
 ## 安装方法
 

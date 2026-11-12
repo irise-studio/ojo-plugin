@@ -9,7 +9,7 @@ For an authorized import-and-optimize request, the sequence is:
 1. Read-only source/scaffold preflight and baseline inventory.
 2. Behavior-preserving conversion into a separate workspace, using a verified real OJO export.
 3. Export-native typecheck/build/package checks and at least one real default snapshot per page.
-4. Authorized publication to the explicit target using the target-compatible publish workflow, including [default Team setup](../../ojo-workspace/references/upload-team.md) (原型设计团队 unless explicitly overridden; new targets save and verify Team before ZIP upload), followed by artifact/API checks. Local Irise Web canvas verification is temporarily unavailable.
+4. Authorized new-framework publication with the verified next CLI, followed by artifact readback. Requested Team configuration remains pending until supported by that CLI. Local Irise Web canvas verification is temporarily unavailable.
 5. A concrete optimization proposal grounded in the imported page.
 6. User confirmation when requested, then prototype edits, rebuild, and snapshots as needed. Publish updated artifacts only within the user's upload scope and report visible verification as unavailable while the local canvas restriction is active.
 
@@ -31,7 +31,7 @@ This example is not itself user authorization. Apply a preference only when the 
 
 Use the source/export inventory and provenance rules in the parent skill. The plugin does not bundle a production scaffold; ask for a usable real OJO export only after targeted local inspection fails. Never create a dummy runtime to pass the gate.
 
-Use a user-supplied project URL/ID or an exact verified association whose publication is authorized. If a target is missing, ask for that target while continuing independent local work. `@touchine/ojo >=1.0.9 <2.0.0` provides `project import --name` to create a project when the user authorizes creation; follow [project import](../../ojo-workspace/references/legacy-import.md). Remote `chat` can create a project while sending a message, but only use that side effect when the user explicitly requests a new conversation project; it is not a substitute for an import target. Respect empty-project and version constraints; an overwrite is not an acceptable fallback.
+Use an explicitly authorized new-framework project ID, or create an authorized empty target with `project create --name <name> --json`. Follow [publication](../../ojo-workspace/references/project-import.md), persist the identity before uploading, and reuse it on retries. Use remote chat only for a requested message.
 
 For checked projects targeting `ojo.art`, apply the [publication policy](publication-policy.md). Reuse an explicit upload request or the user's standing authorization; production alone does not introduce another confirmation. Passing conversion checks does not override analysis-only or no-upload instructions.
 

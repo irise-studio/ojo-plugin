@@ -9,7 +9,7 @@ Follow [CLI and API only](references/transport-policy.md) for all operations. Br
 
 ## Supported CLI
 
-Run the bundled `../../scripts/check-ojo-cli.mjs` and use the exact executable in its `command` field. It checks a compatible `@touchine-ai/ojo` 2.x or stable `@touchine/ojo` 1.x (at least 1.0.9). Select the primary CLI with `OJO_CLI_BIN` when needed.
+Run the bundled `../../scripts/check-ojo-cli.mjs` and use the exact executable in its `command` field. It accepts only `@touchine-ai/ojo` 2.x with server.v1 capabilities. Select the primary CLI with `OJO_CLI_BIN` when needed.
 
 For a missing primary CLI:
 
@@ -17,7 +17,7 @@ For a missing primary CLI:
 npm install -g @touchine-ai/ojo@latest
 ```
 
-An `ok: true` result with `generation: next` supports the shared commands below. For ZIP import or Team operations, run the checker with `--legacy-import` and use its returned executable for every related command, including login. This explicit check prefers `OJO_LEGACY_CLI_BIN` when set. Never run legacy import or Team commands on the next CLI.
+For publication run the same checker with `--import`. It verifies empty-project creation and prototype publication on the same next CLI. A missing command stops remote publication.
 
 See [CLI contract](references/cli-contract.md) for the enabled command surface.
 
@@ -42,14 +42,9 @@ If an operation returns `AUTH_REQUIRED`, follow the no-auto-open login flow in [
 
 ## Import or update a project
 
-Follow [project import](references/legacy-import.md) for an explicitly authorized upload. Require a successful `--legacy-import` check before any target or Team write. Use `ojo project team list/get/set` and [Team setting](references/upload-team.md) where required.
+Follow [new-framework publication](references/project-import.md) for an explicitly authorized upload. Require a successful `--import` check before remote writes. Use `project create --name <name> --json` for an authorized new target, record the returned ID, then `prototype publish <workspacePath> --project-id <id> --json` on the same executable and environment. Preserve target identity on retries and verify artifacts through `workspace sync`.
 
-`project import` accepts a built workspace and either:
-
-- `--project-id <id>` for an explicitly selected empty project; or
-- `--name <name> --team-id <id>` for an authorized new project.
-
-It is not a conversion or build command. Validate and sanitize the workspace first, preserve its import receipt, and verify the returned project and Team through supported CLI/API reads.
+The current next CLI has no Team setting command. Follow [Team status](references/upload-team.md) and report any requested Team as pending.
 
 ## Remote proposal and execution
 

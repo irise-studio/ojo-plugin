@@ -47,7 +47,7 @@ Then verify its version and command signatures with the bundled checker:
 node codex-plugin/scripts/check-ojo-cli.mjs
 ```
 
-This repository distributes the Codex plugin, not the OJO CLI. Both CLI generations provide workspace sync, chat/query, screen, and conversion reporting. Legacy ZIP import and Team operations require 1.x. When the next CLI is the default, set `OJO_LEGACY_CLI_BIN` to select a separate legacy executable for imports. Local prototype validation and builds use the export's own scripts.
+Remote workflows require the next `@touchine-ai/ojo` 2.x CLI. Import preflight (`check-ojo-cli.mjs --import`) requires server.v1 `project create` and `prototype publish` on the same executable. Missing features stop publication. Team configuration remains pending until supported by the next CLI.
 
 ## Installation
 
