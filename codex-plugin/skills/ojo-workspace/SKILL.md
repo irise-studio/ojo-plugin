@@ -44,7 +44,7 @@ If an operation returns `AUTH_REQUIRED`, follow the no-auto-open login flow in [
 
 Follow [new-framework publication](references/project-import.md) for an explicitly authorized upload. Require a successful `--import` check before remote writes. Use `project create --name <name> --json` for an authorized new target, record the returned ID, then `prototype publish <workspacePath> --project-id <id> --json` on the same executable and environment. Preserve target identity on retries and verify artifacts through `workspace sync`.
 
-The current next CLI has no Team setting command. Follow [Team status](references/upload-team.md) and report any requested Team as pending.
+Before publication, follow [Team configuration](references/upload-team.md) to resolve, set and verify 原型设计团队 unless the user selected another Team. Stop publication if setup or readback fails.
 
 ## Remote proposal and execution
 

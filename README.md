@@ -31,7 +31,7 @@ npx -y github:irise-studio/ojo-plugin#main install
 - 插件所需的 skills、说明文档和本地辅助脚本。
 
 本仓库不包含 OJO CLI 的实现，也不要求普通插件用户读取单独的 `irise-studio/irise-web` 仓库。
-所有工作流仅使用 `@touchine-ai/ojo` 2.x。导入检查使用 `check-ojo-cli.mjs --import`，要求 `project create` 和 `prototype publish`，创建与上传均走 server.v1。缺少功能时停止远端写入。新版 CLI 尚不支持 Team 配置时报告待处理。
+所有工作流仅使用 `@touchine-ai/ojo` 2.x。导入检查使用 `check-ojo-cli.mjs --import`，要求 `project create` 和 `prototype publish`，创建与上传均走 server.v1。缺少功能时停止远端写入。上传前通过新版 project team 命令设置并验证原型设计团队（或用户指定的 Team）。
 
 ## 已支持的插件
 

@@ -47,7 +47,7 @@ npm install -g @touchine-ai/ojo@latest
 node codex-plugin/scripts/check-ojo-cli.mjs
 ```
 
-所有远端工作流仅使用新版 `@touchine-ai/ojo` 2.x。导入前执行 `check-ojo-cli.mjs --import`，确认同一 CLI 支持 server.v1 的 `project create` 和 `prototype publish`。缺少任一能力时停止上传。Team 配置暂不受新版 CLI 支持，报告待处理。
+所有远端工作流仅使用新版 `@touchine-ai/ojo` 2.x。导入前执行 `check-ojo-cli.mjs --import`，确认同一 CLI 支持 server.v1 的 `project create` 和 `prototype publish`。缺少任一能力时停止上传。上传前通过新版 project team 命令设置并验证原型设计团队（或用户指定的 Team）。
 
 ## 安装方法
 

@@ -9,7 +9,7 @@ For an authorized import-and-optimize request, the sequence is:
 1. Read-only source/scaffold preflight and baseline inventory.
 2. Behavior-preserving conversion into a separate workspace, using a verified real OJO export.
 3. Export-native typecheck/build/package checks and at least one real default snapshot per page.
-4. Authorized new-framework publication with the verified next CLI, followed by artifact readback. Requested Team configuration remains pending until supported by that CLI. Local Irise Web canvas verification is temporarily unavailable.
+4. Authorized new-framework publication with the verified next CLI, followed by artifact readback. Resolve and verify the requested/default 原型设计团队 through the next CLI before publication and read it back afterward. Local Irise Web canvas verification is temporarily unavailable.
 5. A concrete optimization proposal grounded in the imported page.
 6. User confirmation when requested, then prototype edits, rebuild, and snapshots as needed. Publish updated artifacts only within the user's upload scope and report visible verification as unavailable while the local canvas restriction is active.
 

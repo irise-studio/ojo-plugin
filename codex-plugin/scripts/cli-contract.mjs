@@ -8,6 +8,9 @@ const sharedCommands = {
 };
 
 const importCommands = {
+  projectTeamList: [["project", "team", "list"], [/Usage: ojo project team list/, /--json/]],
+  projectTeamGet: [["project", "team", "get"], [/Usage: ojo project team get/, /<projectId>/, /--json/]],
+  projectTeamSet: [["project", "team", "set"], [/Usage: ojo project team set/, /<projectId>/, /--name <name>/, /--team-id <id>/, /--json/]],
   projectCreate: [["project", "create"], [/Usage: ojo project create/, /--name <name>/, /--json/]],
   prototypeValidate: [["prototype", "validate"], [/Usage: ojo prototype validate/, /--json/]],
   prototypeBuild: [["prototype", "build"], [/Usage: ojo prototype build/, /--json/]],

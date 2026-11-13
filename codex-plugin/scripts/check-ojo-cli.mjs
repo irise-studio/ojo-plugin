@@ -12,7 +12,7 @@ process.stdout.write(`${JSON.stringify({
   ...result,
   command,
   ...(result.ok ? {} : {
-    cliSetup: `Install a next CLI supporting project create and prototype publish: npm install -g ${NEXT_CLI_PACKAGE}`,
+    cliSetup: `Install a next CLI supporting project create, project team and prototype publish: npm install -g ${NEXT_CLI_PACKAGE}`,
   }),
 })}\n`);
 process.exitCode = result.ok ? 0 : 1;
