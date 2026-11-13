@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { checkOjoCli } from "../codex-plugin/scripts/cli-contract.mjs";
 
-const output = 'Usage: ojo project team list Usage: ojo project team get Usage: ojo project team set <projectId> --team-id <id> Usage: ojo workspace sync Usage: ojo project create Usage: ojo prototype validate Usage: ojo prototype build Usage: ojo prototype publish --path <dir> --json --name <name> --project-id <projectId> --message <msg> --mode <mode> --no-open <eventFile>';
+const output = 'Usage: ojo project team list Usage: ojo project team get Usage: ojo project team set <projectId> --team-id <id> --sync-skills Usage: ojo workspace sync Usage: ojo project create Usage: ojo prototype validate Usage: ojo prototype build Usage: ojo prototype publish --path <dir> --json --name <name> --project-id <projectId> --message <msg> --mode <mode> --no-open <eventFile>';
 function fixture({missing, capabilities = {schemaVersion:2,generation:"next",serviceApi:"server.v1",localPrototypePublishProtocol:1}} = {}) {
   const calls = [];
   return {calls, run(args) {
@@ -38,4 +38,13 @@ test('a stale legacy import invocation is rejected before upload discovery', () 
   const f = fixture();
   assert.equal(checkOjoCli(f.run,{legacyImport:true}).reason,'legacy_import_removed');
   assert.deepEqual(f.calls,[['--version']]);
+});
+
+test('import rejects a Team command that cannot synchronize associated Skills', () => {
+  const f=fixture();
+  const run=(args)=>{
+    const out=f.run(args);
+    return args.slice(0,-1).join(' ')==='project team set' ? out.replace('--sync-skills','') : out;
+  };
+  assert.equal(checkOjoCli(run,{importProject:true}).ok,false);
 });

@@ -6,4 +6,4 @@ For project import run the same checker with `--import`. It also requires public
 
 Shared commands remain `auth login`, `workspace sync`, `chat`, `query`, `screen` and `conversion report`. Authenticate using the same explicit API/auth origins used for creation and publication. Keep credentials in the CLI.
 
-Follow [publication](project-import.md) to create an authorized empty target, retain its identity, publish and read back the artifacts. Creating a project via chat sends a message and is not an import-target operation. Resolve and verify the requested/default 原型设计团队 using the new-framework Team commands before publication.
+Follow [publication](project-import.md) to create an authorized empty target, retain its identity, publish and read back the artifacts. Creating a project via chat sends a message and is not an import-target operation. Resolve and verify the requested/default 原型设计团队 using the new-framework Team commands and its associated runtime Skills using --sync-skills before publication.

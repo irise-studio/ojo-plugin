@@ -29,7 +29,7 @@ Do not create a conversation to obtain a project ID. Do not reuse a legacy `.ojo
 
 ## Set the Team before publication
 
-Follow [Team configuration](upload-team.md). Use the current new-framework Team catalog to resolve 原型设计团队 unless the user selected another Team, set it on the recorded target and require verified readback. Preserve skill/profile context and persist the verified Team ID in the import receipt. A missing CLI Team command or failed verification stops publication without creating another target.
+Follow [Team configuration](upload-team.md). Use the current new-framework Team catalog to resolve 原型设计团队 unless the user selected another Team, set it on the recorded target with --sync-skills and require verified readback of both Team and runtime Skill IDs. Respect customized Skill selections on existing targets and preserve other context fields. Persist the verified Team ID and runtime Skill IDs in the import receipt. A missing CLI Team command or failed verification stops publication without creating another target.
 
 ## Publish and read back
 
@@ -43,6 +43,6 @@ This rebuilds through the next CLI gates, reads the target via server.v1 canvas-
 ojo workspace sync <recordedProjectId> --path /absolute/path/readback --json
 ```
 
-Verify the returned project ID and downloaded workspace/page/snapshot artifacts against the validated input. Run `project team get <recordedProjectId> --json` again and confirm the saved Team survived publication. Report request acceptance, artifact readback, and hosted rendering as separate results. Browser verification is unavailable in this plugin.
+Verify the returned project ID and downloaded workspace/page/snapshot artifacts against the validated input. Run `project team get <recordedProjectId> --json` again and confirm the saved Team and Skill selection survived publication. Report request acceptance, artifact readback, and hosted rendering as separate results. Browser verification is unavailable in this plugin.
 
 This workflow uses only new-framework project, display-team and prototype publication APIs. Team setup is verified through the project workspace context, separately from agent execution or browser rendering.
