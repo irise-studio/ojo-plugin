@@ -83,6 +83,6 @@ or authorized new project, use the verified next CLI, and preserve its
 target identity and version constraints. Rebuild and publish changed
 snapshots. Report the actual target and result separately from canvas verification.
 
-For a requested Team, retain the requested/default 原型设计团队 intent and follow [Team status](../ojo-workspace/references/upload-team.md). The next CLI has no Team settings command, so report it as pending. Publish and verify the authorized target through server.v1 before handing it to OJO for optimization.
+Before publication follow [Team configuration](../ojo-workspace/references/upload-team.md). Default to 原型设计团队 unless the user selects another Team. For a new target, save and verify the canonical new-framework Team ID and its resolved runtime Skill IDs with --sync-skills before uploading. Preserve other workspace context and respect customized Skill selections on existing targets.
 
 Finish with the output link, page mapping, validation results, behavior changes, and blockers. Update the report with evidence. Distinguish export-format alignment, local build/package checks, optional standalone HTML evidence, unavailable project-bound OJO canvas validation, and remote publication. Claim OJO runtime compatibility only for a tested target and its observed behavior, never from local compilation alone.

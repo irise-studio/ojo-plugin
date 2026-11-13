@@ -31,7 +31,7 @@ This repository is the Irise Studio distribution repository for the OJO plugin f
 - the skills, documentation, and local helper scripts required by those plugins.
 
 This repository does not contain the OJO CLI implementation, and ordinary plugin users do not need read access to the separate `irise-studio/irise-web` repository.
-All workflows use only `@touchine-ai/ojo` 2.x. Import preflight (`check-ojo-cli.mjs --import`) requires `project create` and `prototype publish` through server.v1. Missing features stop remote writes. Team setup remains pending until supported by the next CLI.
+All workflows use only `@touchine-ai/ojo` 2.x. Import preflight (`check-ojo-cli.mjs --import`) requires `project create` and `prototype publish` through server.v1. Missing features stop remote writes. Before publication the next CLI sets and verifies the requested/default Prototyping Team.
 
 ## Supported plugins
 

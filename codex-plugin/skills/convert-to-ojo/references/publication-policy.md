@@ -8,7 +8,7 @@ authorization for the selected project; do not upload unrelated local projects.
 Analysis-only, conversion-only, no-upload, and proposal-approval limits still
 apply. Installing or invoking the skill alone is not permission to upload files.
 
-The authorized upload includes creating the selected new-framework target and publishing its validated artifacts with the next CLI. Requested Team intent is recorded as pending until the next CLI supports it. Reuse scoped upload authorization for these necessary writes. Service and tool denials remain authoritative.
+The authorized upload includes creating the selected new-framework target and publishing its validated artifacts with the next CLI. Setting and verifying the requested/default Team on the selected target is part of that authorized upload, using the next CLI project context API. Reuse scoped upload authorization for these necessary writes. Service and tool denials remain authoritative.
 
 “Passes” means evidence from the actual workspace: compatibility preflight admits
 the project, required adaptations are complete, the selected export/runtime is

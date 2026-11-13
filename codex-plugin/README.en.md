@@ -47,7 +47,7 @@ Then verify its version and command signatures with the bundled checker:
 node codex-plugin/scripts/check-ojo-cli.mjs
 ```
 
-Remote workflows require the next `@touchine-ai/ojo` 2.x CLI. Import preflight (`check-ojo-cli.mjs --import`) requires server.v1 `project create` and `prototype publish` on the same executable. Missing features stop publication. Team configuration remains pending until supported by the next CLI.
+Remote workflows require the next `@touchine-ai/ojo` 2.x CLI. Import preflight (`check-ojo-cli.mjs --import`) requires server.v1 `project create` and `prototype publish` on the same executable. Missing features stop publication. Before publication the next CLI sets and verifies the requested/default Prototyping Team.
 
 ## Installation
 
