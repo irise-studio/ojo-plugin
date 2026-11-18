@@ -4,6 +4,8 @@
 
 # OJO Codex Plugin
 
+本页介绍 Codex 插件。Claude Code 和其他 agent 使用 CLI + 独立 skills，见[按 agent 安装](../README.md)。
+
 ## 插件功能
 
 OJO 插件帮助 Codex 将本地网站或应用接入 OJO 工作流。当前支持：
@@ -56,13 +58,7 @@ node codex-plugin/scripts/check-ojo-cli.mjs
 执行以下命令：
 
 ```bash
-npx -y @touchine/ojo-plugin@latest install
-```
-
-也可以直接从 GitHub 安装：
-
-```bash
-npx -y github:irise-studio/ojo-plugin#main install
+npx -y github:irise-studio/ojo-plugin#main install --agent codex
 ```
 
 安装器检查 Node/Codex、保留已通过版本与命令检查的 CLI；只有缺失时才执行 `npm install --global @touchine-ai/ojo@latest`。随后注册或刷新本仓库 marketplace，执行 `codex plugin add ojo@irise-studio`，并回读已安装、已启用状态。重复运行会刷新同一来源并重新验证。

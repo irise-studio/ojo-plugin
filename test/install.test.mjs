@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { delimiter } from "node:path";
-import { readFileSync } from "node:fs";
+import { delimiter, join } from "node:path";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { install } from "../lib/install.mjs";
@@ -209,4 +210,170 @@ test("the actual entrypoint exposes help/version and rejects unknown arguments",
     else assert.match(result.stdout + result.stderr, output);
     assert.doesNotMatch(result.stdout, /Checking Codex/);
   }
+});
+
+function isolatedHome(t) {
+  const homeDir = mkdtempSync(join(tmpdir(), "ojo agent home "));
+  t.after(() => rmSync(homeDir, { recursive: true, force: true }));
+  return homeDir;
+}
+
+test("Claude Code installs persistent skills and runnable helpers without Codex", (t) => {
+  const homeDir = isolatedHome(t);
+  const { state, execute } = environment({ cli: null, oldCodex: true });
+  execute({ agent: "claude-code", homeDir });
+  const root = join(homeDir, ".claude", "skills");
+  assert.deepEqual(readdirSync(root).sort(), ["build-irise-prototype", "convert-to-ojo", "generate-irise-snapshots", "ojo-workspace"]);
+  assert.equal(state.calls.some(({ command }) => command === "codex" || command === "claude"), false);
+  assert.deepEqual(state.mutations, [["npm", "install", "--global", "@touchine-ai/ojo@latest"]]);
+  const skill = readFileSync(join(root, "build-irise-prototype", "SKILL.md"), "utf8");
+  assert.match(skill, /\.\.\/ojo-workspace\/scripts\/check-ojo-cli\.mjs/);
+  assert.equal(existsSync(join(root, "generate-irise-snapshots", "scripts", "build-local-snapshots.mjs")), true);
+  const checker = spawnSync(process.execPath, [join(root, "ojo-workspace", "scripts", "check-ojo-cli.mjs")], {
+    env: { ...process.env, OJO_CLI_BIN: process.execPath }, encoding: "utf8",
+  });
+  assert.equal(checker.status, 1);
+  assert.equal(JSON.parse(checker.stdout).reason, "unsupported_ojo_cli_version");
+  assert.match(state.output.join("\n"), /skills.*installed/i);
+});
+
+test("other agents use a shared default or a custom skills directory", (t) => {
+  const homeDir = isolatedHome(t);
+  for (const skillsDir of [undefined, join(homeDir, "custom agent", "skills")]) {
+    const { state, execute } = environment({ oldCodex: true });
+    execute({ agent: "other", homeDir, skillsDir });
+    assert.equal(existsSync(join(skillsDir || join(homeDir, ".agents", "skills"), "convert-to-ojo", "SKILL.md")), true);
+    assert.equal(state.calls.some(({ command }) => command === "codex"), false);
+    assert.equal(state.mutations.length, 0);
+  }
+});
+
+test("Claude Code respects its configured directory", (t) => {
+  const homeDir = isolatedHome(t);
+  environment().execute({ agent: "claude-code", homeDir, env: { PATH: "/usr/bin", CLAUDE_CONFIG_DIR: join(homeDir, "claude config") } });
+  assert.equal(existsSync(join(homeDir, "claude config", "skills", "ojo-workspace", "SKILL.md")), true);
+});
+
+test("repeat installs refresh managed skills and preserve unrelated skills", (t) => {
+  const homeDir = isolatedHome(t);
+  const root = join(homeDir, ".claude", "skills");
+  mkdirSync(join(root, "unrelated"), { recursive: true });
+  writeFileSync(join(root, "unrelated", "SKILL.md"), "user content");
+  const { execute } = environment();
+  execute({ agent: "claude-code", homeDir });
+  execute({ agent: "claude-code", homeDir });
+  assert.equal(readFileSync(join(root, "unrelated", "SKILL.md"), "utf8"), "user content");
+  assert.equal(readdirSync(root).length, 5);
+});
+
+test("conflicts and locally edited managed skills stop before any CLI install", (t) => {
+  const homeDir = isolatedHome(t);
+  const root = join(homeDir, ".agents", "skills");
+  mkdirSync(join(root, "ojo-workspace"), { recursive: true });
+  writeFileSync(join(root, "ojo-workspace", "SKILL.md"), "local skill");
+  const conflict = environment({ cli: null });
+  assert.throws(() => conflict.execute({ agent: "other", homeDir }), /conflict|unmanaged/i);
+  assert.equal(conflict.state.calls.length, 0);
+  assert.equal(existsSync(join(root, "convert-to-ojo")), false);
+  rmSync(join(root, "ojo-workspace"), { recursive: true });
+  environment().execute({ agent: "other", homeDir });
+  writeFileSync(join(root, "ojo-workspace", "SKILL.md"), "edited by user");
+  const edited = environment({ cli: null });
+  assert.throws(() => edited.execute({ agent: "other", homeDir }), /modified|edited/i);
+  assert.equal(edited.state.calls.length, 0);
+  assert.equal(readFileSync(join(root, "ojo-workspace", "SKILL.md"), "utf8"), "edited by user");
+});
+
+test("standalone dry-run and failed CLI installation leave no skills or directories", (t) => {
+  const homeDir = isolatedHome(t);
+  const dry = environment({ cli: null, oldCodex: true });
+  dry.execute({ agent: "claude-code", homeDir, dryRun: true });
+  assert.deepEqual(readdirSync(homeDir), []);
+  assert.equal(dry.state.mutations.length, 0);
+  assert.match(dry.state.output.join("\n"), /skills/i);
+  assert.doesNotMatch(dry.state.output.join("\n"), /Installation verified|skills installed/i);
+  const failed = environment({ cli: null, failAt: "--global" });
+  assert.throws(() => failed.execute({ agent: "claude-code", homeDir }), /network or permission/);
+  assert.deepEqual(readdirSync(homeDir), []);
+});
+
+test("invalid targets and Codex skills-dir are rejected before processes run", (t) => {
+  const homeDir = isolatedHome(t);
+  for (const options of [{ agent: "unknown" }, { agent: "codex", skillsDir: homeDir }, { agent: "other", skillsDir: "" }]) {
+    const { state, execute } = environment();
+    assert.throws(() => execute(options), /agent|skills-dir/i);
+    assert.equal(state.calls.length, 0);
+  }
+});
+
+test("entrypoint rejects missing, duplicate, and invalid target flags before installation", () => {
+  const entrypoint = fileURLToPath(new URL("../bin/ojo-plugin.mjs", import.meta.url));
+  for (const args of [["--agent"], ["--agent", "other", "--agent", "codex"], ["--skills-dir"], ["--agent", "unknown"], ["--agent", "codex", "--skills-dir", "/tmp/unused"]]) {
+    const result = spawnSync(process.execPath, [entrypoint, "install", ...args], { encoding: "utf8" });
+    assert.equal(result.status, 1);
+    assert.doesNotMatch(result.stdout, /Checking/);
+  }
+});
+
+test("standalone installs refuse symbolic links and preserve added user files", (t) => {
+  const homeDir = isolatedHome(t);
+  const skillsDir = join(homeDir, "skills");
+  const outside = join(homeDir, "outside");
+  mkdirSync(skillsDir);
+  mkdirSync(outside);
+  writeFileSync(join(outside, "SKILL.md"), "outside skill");
+  symlinkSync(outside, join(skillsDir, "ojo-workspace"), process.platform === "win32" ? "junction" : "dir");
+  const linked = environment({ cli: null });
+  assert.throws(() => linked.execute({ agent: "other", skillsDir }), /conflict/i);
+  assert.equal(linked.state.calls.length, 0);
+  assert.equal(readFileSync(join(outside, "SKILL.md"), "utf8"), "outside skill");
+  rmSync(join(skillsDir, "ojo-workspace"));
+  environment().execute({ agent: "other", skillsDir });
+  writeFileSync(join(skillsDir, "ojo-workspace", "my-notes.txt"), "keep me");
+  assert.throws(() => environment().execute({ agent: "other", skillsDir }), /modified/i);
+  assert.equal(readFileSync(join(skillsDir, "ojo-workspace", "my-notes.txt"), "utf8"), "keep me");
+});
+
+test("standalone installs reject invalid or missing override CLIs without writing files", (t) => {
+  const homeDir = isolatedHome(t);
+  for (const cli of [null, "1.0.9"]) {
+    const { state, execute } = environment({ cli });
+    assert.throws(() => execute({ agent: "other", homeDir, env: { PATH: "/usr/bin", OJO_CLI_BIN: "/custom cli/ojo" } }), /OJO_CLI_BIN/);
+    assert.equal(state.mutations.length, 0);
+    assert.deepEqual(readdirSync(homeDir), []);
+  }
+});
+
+test("a skills root symlink to a file is rejected before installing a missing CLI", (t) => {
+  const homeDir = isolatedHome(t);
+  const target = join(homeDir, "file");
+  const skillsDir = join(homeDir, "skills");
+  writeFileSync(target, "keep");
+  if (process.platform === "win32") {
+    // File symlinks require extra Windows privileges; a plain file exercises
+    // the same preflight boundary there.
+    writeFileSync(skillsDir, "keep");
+  } else symlinkSync(target, skillsDir);
+  const { state, execute } = environment({ cli: null });
+  assert.throws(() => execute({ agent: "other", skillsDir }));
+  assert.equal(state.calls.length, 0);
+});
+
+test("a dangling skills root symlink stops before installing the CLI", { skip: process.platform === "win32" }, (t) => {
+  const homeDir = isolatedHome(t);
+  const skillsDir = join(homeDir, "skills");
+  symlinkSync(join(homeDir, "missing"), skillsDir);
+  const { state, execute } = environment({ cli: null });
+  assert.throws(() => execute({ agent: "other", skillsDir }));
+  assert.equal(state.calls.length, 0);
+});
+
+test("reinstall protects a user file named __proto__", (t) => {
+  const homeDir = isolatedHome(t);
+  const { execute } = environment();
+  execute({ agent: "other", homeDir });
+  const userFile = join(homeDir, ".agents", "skills", "ojo-workspace", "__proto__");
+  writeFileSync(userFile, "user content");
+  assert.throws(() => execute({ agent: "other", homeDir }), /modified/i);
+  assert.equal(readFileSync(userFile, "utf8"), "user content");
 });
