@@ -4,6 +4,8 @@
 
 # OJO Codex Plugin
 
+This page covers the Codex plugin. Claude Code and other agents install CLI + standalone skills; see [installation by agent](../README.en.md).
+
 ## Features
 
 The OJO plugin helps Codex connect local websites and applications to OJO workflows. It currently supports:
@@ -56,13 +58,7 @@ Remote workflows require the next `@touchine-ai/ojo` 2.x CLI. Import preflight (
 Run:
 
 ```bash
-npx -y @touchine/ojo-plugin@latest install
-```
-
-Alternatively, install directly from GitHub:
-
-```bash
-npx -y github:irise-studio/ojo-plugin#main install
+npx -y github:irise-studio/ojo-plugin#main install --agent codex
 ```
 
 The installer checks Node/Codex and preserves a CLI that passes the version and command checks. Only a missing CLI triggers `npm install --global @touchine-ai/ojo@latest`. It then registers or refreshes this repository's marketplace, runs `codex plugin add ojo@irise-studio`, and reads back installed/enabled state. Rerunning refreshes the same source and verifies again.

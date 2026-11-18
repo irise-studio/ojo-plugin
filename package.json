@@ -1,10 +1,10 @@
 {
   "name": "@touchine/ojo-plugin",
   "version": "0.1.1",
-  "description": "Install and verify the OJO Codex plugin and its OJO CLI dependency",
+  "description": "Install OJO CLI with a Codex plugin or standalone skills for Claude Code and other agents",
   "type": "module",
   "bin": { "ojo-plugin": "bin/ojo-plugin.mjs" },
-  "files": ["bin/", "lib/", "codex-plugin/scripts/check-ojo-cli.mjs", "codex-plugin/scripts/cli-contract.mjs", "codex-plugin/scripts/run-cli.mjs", "README.en.md"],
+  "files": ["bin/", "lib/", "codex-plugin/scripts/", "codex-plugin/skills/", "README.en.md"],
   "engines": { "node": ">=20" },
   "scripts": { "test": "node --test", "prepublishOnly": "npm test" },
   "dependencies": { "cross-spawn": "^7.0.6" },
